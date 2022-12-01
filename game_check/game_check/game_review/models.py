@@ -1,0 +1,164 @@
+from enum import Enum
+
+from django.core import validators
+from django.db import models
+from django.contrib.auth import models as auth_models
+from game_check.game_review.managers import SiteUserManager
+from game_check.game_review.validators import username_validator, validate_file_less_than_one, age_validator, \
+    score_validator
+
+
+# TODO: Need another class, only 4 currently
+class ChoicesEnumMixin:
+    @classmethod
+    def choices(cls):
+        return [(x.name, x.value) for x in cls]
+
+    @classmethod
+    def max_len(cls):
+        return max(len(name) for name, _ in cls.choices())
+
+
+class Gender(ChoicesEnumMixin, Enum):
+    male = 'Male'
+    female = 'Female'
+    DoNotShow = 'Do not show'
+
+
+class SiteUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
+    MAX_LEN_USERNAME = 20
+    MIN_LEN_USERNAME = 6
+
+    username = models.CharField(
+        max_length=MAX_LEN_USERNAME,
+        unique=True,
+        null=False,
+        blank=False,
+        validators=(
+            username_validator,
+            validators.MinLengthValidator(MIN_LEN_USERNAME),
+        ),
+    )
+
+    email = models.EmailField(
+        unique=True,
+        null=False,
+        blank=False,
+    )
+    # TODO: Is email field needed?
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = 'username'
+
+    objects = SiteUserManager()
+
+
+class Profile(models.Model):
+    MAX_NAME_LEN = 25
+    MAX_LEN_BIO = 250
+
+    name = models.CharField(
+        max_length=MAX_NAME_LEN,
+    )
+
+    age = models.PositiveIntegerField(
+        validators=(
+            age_validator,
+        ),
+    )
+
+    gender = models.CharField(
+        choices=Gender.choices(),
+        max_length=Gender.max_len(),
+    )
+
+    avatar = models.ImageField(
+        upload_to='avatars/',
+        validators=(
+            validate_file_less_than_one,
+        ),
+    )
+
+    bio = models.TextField(
+        max_length=MAX_LEN_BIO,
+    )
+
+    user = models.OneToOneField(
+        SiteUser,
+        primary_key=True,
+        on_delete=models.CASCADE,
+    )
+
+
+class GameScore(models.Model):
+
+    value = models.FloatField(
+        validators=(
+            score_validator,
+        ),
+        null=False,
+        blank=False,
+    )
+
+    user = models.ForeignKey(
+        SiteUser,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+    )
+
+
+class GameComment(models.Model):
+    MAX_LEN_CONT = 250
+
+    content = models.TextField(
+        max_length=MAX_LEN_CONT,
+        null=True,
+        blank=True,
+    )
+
+    user = models.ForeignKey(
+        SiteUser,
+        on_delete=models.RESTRICT,
+        null=False,
+        blank=False,
+    )
+
+
+class GameFavourite(models.Model):
+    is_favourite = models.BooleanField(default=False)
+
+    user = models.ForeignKey(
+        SiteUser,
+        on_delete=models.RESTRICT,
+    )
+
+
+class Game(models.Model):
+    MAX_TITLE_LEN = 100
+    MAX_LEN_TEXT = 250
+
+    title = models.CharField(
+        max_length=MAX_TITLE_LEN,
+    )
+
+    image = models.ImageField(
+        upload_to='game_images/',
+        validators=(
+            validate_file_less_than_one,
+        ),
+    )
+
+    game_score = models.ForeignKey(
+        GameScore,
+        on_delete=models.RESTRICT,
+    )
+
+    game_comment = models.ForeignKey(
+        GameComment,
+        on_delete=models.RESTRICT,
+    )
+
+    game_favourite = models.ForeignKey(
+        GameFavourite,
+        on_delete=models.RESTRICT,
+    )
