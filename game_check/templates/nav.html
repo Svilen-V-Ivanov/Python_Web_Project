@@ -1,0 +1,26 @@
+<nav>
+    <div>
+        <a href="{% url 'index' %}">
+            Index
+        </a>
+    </div>
+    {% if not request.user.is_authenticated %}
+        <div>
+            <a href="{% url 'sign up user' %}">
+                Sign up
+            </a>
+            <a href="{% url 'sign in user' %}">
+                Sign in
+            </a>
+        </div>
+    {% else %}
+        <div>
+            <a href="{% url 'profile'  slug=user.slug pk=user.pk %}">
+                Profile
+            </a>
+            <a href="{% url 'sign out user' %}">
+                Sign out
+            </a>
+        </div>
+    {% endif %}
+</nav>

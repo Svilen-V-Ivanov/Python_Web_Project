@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GameCheck</title>
+</head>
+<body>
+
+<header>
+    {% include 'nav.html' %}
+</header>
+
+<ul>
+    <li>
+        <a href="{% url 'details profile' slug=user.slug pk=user.pk %}">Account Details</a>
+    </li>
+    <li>
+        <a href="{% url 'edit password' slug=user.slug pk=user.pk %}">Change Password</a>
+    </li>
+    <li>
+        <a href="{% url 'edit email' slug=user.slug pk=user.pk %}">Change Email</a>
+    </li>
+</ul>
+<ul>
+    <li>
+        <a href="{% url 'reviewed games' slug=user.slug pk=user.pk %}">Reviewed Games</a>
+    </li>
+    <li>
+        <a href="{% url 'favourite games' slug=user.slug pk=user.pk %}">Favourite Games</a>
+    </li>
+</ul>
+</body>
+</html>
