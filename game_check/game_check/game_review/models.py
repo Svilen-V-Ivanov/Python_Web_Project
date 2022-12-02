@@ -3,6 +3,8 @@ from enum import Enum
 from django.core import validators
 from django.db import models
 from django.contrib.auth import models as auth_models
+from django.utils.text import slugify
+
 from game_check.game_review.managers import SiteUserManager
 from game_check.game_review.validators import username_validator, validate_file_less_than_one, age_validator, \
     score_validator
@@ -45,6 +47,19 @@ class SiteUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
         null=False,
         blank=False,
     )
+
+    slug = models.SlugField(
+        null=False,
+        blank=True,
+        unique=True,
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.slug = slugify(self.username)
+
+        super(SiteUser, self).save(*args, **kwargs)
+
     # TODO: Is email field needed?
     EMAIL_FIELD = "email"
     USERNAME_FIELD = 'username'
@@ -69,6 +84,7 @@ class Profile(models.Model):
     gender = models.CharField(
         choices=Gender.choices(),
         max_length=Gender.max_len(),
+        default='Male',
     )
 
     avatar = models.ImageField(
@@ -76,10 +92,12 @@ class Profile(models.Model):
         validators=(
             validate_file_less_than_one,
         ),
+        default='./media_files/temp-default.jpg'
     )
 
     bio = models.TextField(
         max_length=MAX_LEN_BIO,
+        default='None',
     )
 
     user = models.OneToOneField(
