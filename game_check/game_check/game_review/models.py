@@ -87,23 +87,43 @@ class Profile(models.Model):
         default='Male',
     )
 
+    # TODO: removing default can potentially break the form so be careful later on
     avatar = models.ImageField(
-        upload_to='avatars/',
+        upload_to='avatars',
         validators=(
             validate_file_less_than_one,
         ),
-        default='./media_files/temp-default.jpg'
+        null=True,
+        blank=True,
+        # default='temp-default.jpg'
     )
 
     bio = models.TextField(
         max_length=MAX_LEN_BIO,
-        default='None',
+        default='Create your own bio here!',
     )
 
     user = models.OneToOneField(
         SiteUser,
         primary_key=True,
         on_delete=models.CASCADE,
+    )
+
+
+class Game(models.Model):
+    MAX_TITLE_LEN = 100
+    MAX_LEN_TEXT = 250
+
+    title = models.CharField(
+        max_length=MAX_TITLE_LEN,
+    )
+
+    image = models.ImageField(
+        upload_to='game_images',
+        validators=(
+            validate_file_less_than_one,
+        ),
+
     )
 
 
@@ -124,6 +144,11 @@ class GameScore(models.Model):
         blank=False,
     )
 
+    game = models.ForeignKey(
+        Game,
+        on_delete=models.RESTRICT,
+    )
+
 
 class GameComment(models.Model):
     MAX_LEN_CONT = 250
@@ -141,6 +166,11 @@ class GameComment(models.Model):
         blank=False,
     )
 
+    game = models.ForeignKey(
+        Game,
+        on_delete=models.RESTRICT,
+    )
+
 
 class GameFavourite(models.Model):
     is_favourite = models.BooleanField(default=False)
@@ -150,33 +180,7 @@ class GameFavourite(models.Model):
         on_delete=models.RESTRICT,
     )
 
-
-class Game(models.Model):
-    MAX_TITLE_LEN = 100
-    MAX_LEN_TEXT = 250
-
-    title = models.CharField(
-        max_length=MAX_TITLE_LEN,
-    )
-
-    image = models.ImageField(
-        upload_to='game_images/',
-        validators=(
-            validate_file_less_than_one,
-        ),
-    )
-
-    game_score = models.ForeignKey(
-        GameScore,
-        on_delete=models.RESTRICT,
-    )
-
-    game_comment = models.ForeignKey(
-        GameComment,
-        on_delete=models.RESTRICT,
-    )
-
-    game_favourite = models.ForeignKey(
-        GameFavourite,
+    game = models.ForeignKey(
+        Game,
         on_delete=models.RESTRICT,
     )

@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='profile',
             name='avatar',
-            field=models.ImageField(default='./media_files/temp-default.jpg', upload_to='avatars/', validators=[game_check.game_review.validators.validate_file_less_than_one]),
+            field=models.ImageField(default='./mediafiles/temp-default.jpg', upload_to='avatars/', validators=[game_check.game_review.validators.validate_file_less_than_one]),
         ),
         migrations.AlterField(
             model_name='profile',

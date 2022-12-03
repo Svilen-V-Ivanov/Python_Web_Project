@@ -32,3 +32,10 @@ class SignUpForm(auth_forms.UserCreationForm):
             profile.save()
 
         return user
+
+
+# TODO: Finish form and view for change password
+class ChangeUserPasswordForm(auth_forms.PasswordChangeForm):
+    class Meta:
+        model = UserModel
+        fields = "__all__"

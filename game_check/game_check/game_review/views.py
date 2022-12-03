@@ -1,9 +1,12 @@
+from django.template.context_processors import request
 from django.urls import reverse_lazy
 from django.views import generic as views
-from django.contrib.auth import views as auth_views, login
+from django.contrib.auth import views as auth_views, login, get_user_model
 
 from game_check.game_review.forms import SignUpForm
 from game_check.game_review.models import Profile
+
+UserModel = get_user_model()
 
 
 class IndexView(views.TemplateView):
@@ -49,14 +52,28 @@ class ProfileView(views.DetailView):
 
 
 class UserDetailsView(views.DetailView):
-    pass
+    context_object_name = 'user_details'
+    model = Profile
+    template_name = 'details-profile.html'
 
 
 class UserEditView(views.UpdateView):
-    pass
+    model = Profile
+    fields = ('avatar', 'name', 'age', 'gender', 'bio')
+    template_name = 'edit-profile.html'
+    # TODO: fix success_url to redirect to proper url
+    success_url = reverse_lazy('index')
+
+    # def get_success_url(self):
+    #     result = reverse_lazy('details profile', kwargs={
+    #         'slug': self.object.slug,
+    #         'pk': self.object.pk,
+    #     })
+    #
+    #     return result
 
 
-class PasswordEditView(views.UpdateView):
+class PasswordEditView(auth_views.PasswordChangeView):
     pass
 
 
