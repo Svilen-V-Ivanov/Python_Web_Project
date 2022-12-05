@@ -169,6 +169,7 @@ class GameComment(models.Model):
     game = models.ForeignKey(
         Game,
         on_delete=models.RESTRICT,
+        related_name='comments',
     )
 
 

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GameCheck</title>
+</head>
+<body>
+
+<header>
+    {% include 'nav.html' %}
+</header>
+<ul>
+    <li>
+        {{ game_details.title }}
+    </li>
+    <li>
+        <img src="/media/{{ game_details.image }}" alt="temp-default.jpg" width="50" height="50">
+    </li>
+    {% for commment in comments %}
+        {% if commment.game_id == game_details.pk %}
+            <li>
+                {{ commment.content }}
+            </li>
+        {% endif %}
+    {% endfor %}
+    <li>
+        {% if game_details.pk not in ids %}
+            <form method="post" action="{% url 'comment game'  game_details.pk %} " enctype="multipart/form-data">
+                {{ comment_form.as_p }}
+                <button>Comment</button>
+                {% csrf_token %}
+            </form>
+        {% else %}
+            <li>You've already commented!</li>
+        {% endif %}
+    </li>
+</ul>
+</body>
+</html>

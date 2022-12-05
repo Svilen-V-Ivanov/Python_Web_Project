@@ -9,5 +9,24 @@
 <header>
     {% include 'nav.html' %}
 </header>
+{% if request.user.is_authenticated %}
+    <h1>
+        <a href="{% url 'create game' %}">Create game</a>
+    </h1>
+{% else %}
+{% endif %}
+<h2>
+    {% for game in games %}
+        <li>
+            {{ game.title }}
+        </li>
+        <li>
+            <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
+        </li>
+        <li>
+            <a href="{% url 'details game' pk=game.pk %}">Details game</a>
+        </li>
+    {% endfor %}
+</h2>
 </body>
 </html>

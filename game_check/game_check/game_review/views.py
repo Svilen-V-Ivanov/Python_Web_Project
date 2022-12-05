@@ -1,16 +1,24 @@
-from django.template.context_processors import request
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic as views
-from django.contrib.auth import views as auth_views, login, get_user_model
+from django.contrib.auth import views as auth_views, login, get_user_model, mixins as auth_mixins
 
-from game_check.game_review.forms import SignUpForm
-from game_check.game_review.models import Profile
+from game_check.game_review.forms import SignUpForm, ChangeUserPasswordForm, GameCommentForm
+from game_check.game_review.models import Profile, Game, GameComment
+from game_check.game_review.utils import get_all_user_comments_id
 
 UserModel = get_user_model()
 
 
-class IndexView(views.TemplateView):
-    template_name = 'index.html'
+def index(request):
+    context = {
+        'games': Game.objects.all(),
+    }
+    return render(request, 'index.html', context)
+
+
+# class IndexView(views.TemplateView):
+#     template_name = 'index.html'
 
 
 class UserSignUpView(views.CreateView):
@@ -45,7 +53,7 @@ class UserSignOutView(auth_views.LogoutView):
         return self.get_redirect_url() or self.get_default_redirect_url()
 
 
-class ProfileView(views.DetailView):
+class ProfileView(auth_mixins.LoginRequiredMixin, views.ListView):
     context_object_name = 'profile'
     model = Profile
     template_name = 'info-profile.html'
@@ -74,28 +82,59 @@ class UserEditView(views.UpdateView):
 
 
 class PasswordEditView(auth_views.PasswordChangeView):
-    pass
+    form_class = ChangeUserPasswordForm
+    template_name = 'edit_password.html'
+    success_url = reverse_lazy('index')
 
 
+# TODO: Maybe make changing email look a bit better, also if enough time add signal to send email for email change
 class EmailEditView(views.UpdateView):
-    pass
+    model = UserModel
+    fields = ('email',)
+    template_name = 'edit-email.html'
+    success_url = reverse_lazy('index')
 
 
 class OtherProfileView(views.DetailView):
     pass
 
 
-class GamesReviewedView(views.DetailView):
-    pass
-
-
-class GamesFavouriteView(views.DetailView):
-    pass
-
-
-class GameCreateView(views.CreateView):
-    pass
+class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):
+    template_name = 'create-game.html'
+    model = Game
+    fields = '__all__'
+    success_url = reverse_lazy('index')
 
 
 class GameDetailsView(views.DetailView):
-    pass
+    context_object_name = 'game_details'
+    model = Game
+    comment_form = GameCommentForm()
+    comments = GameComment.objects.all()
+    # TODO: fix the way it's filtering( somehow add game 'pk' as well, since only user+game is unique
+    comment_ids = get_all_user_comments_id(comments)
+    template_name = 'details-game.html'
+    success_url = reverse_lazy('index')
+
+    extra_context = {
+        'comment_form': comment_form,
+        'comments': comments,
+        'ids': comment_ids,
+    }
+
+
+# TODO: Make it log in required
+def comment_game(request, pk):
+    game = Game.objects.filter(pk=pk) \
+        .get()
+    current_user = request.user
+
+    form = GameCommentForm(request.POST)
+
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.game = game
+        comment.user = current_user
+        comment.save()
+        return redirect('index')
+

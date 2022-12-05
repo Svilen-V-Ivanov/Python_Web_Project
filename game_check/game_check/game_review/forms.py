@@ -1,6 +1,6 @@
 from django.contrib.auth import forms as auth_forms, get_user_model
 from django import forms
-from game_check.game_review.models import Profile
+from game_check.game_review.models import Profile, GameComment
 from game_check.game_review.validators import age_validator
 
 UserModel = get_user_model()
@@ -26,6 +26,7 @@ class SignUpForm(auth_forms.UserCreationForm):
             name=self.cleaned_data['name'],
             age=self.cleaned_data['age'],
 
+
         )
 
         if commit:
@@ -38,4 +39,19 @@ class SignUpForm(auth_forms.UserCreationForm):
 class ChangeUserPasswordForm(auth_forms.PasswordChangeForm):
     class Meta:
         model = UserModel
-        fields = "__all__"
+        fields = ('old_password', 'new_password1', 'new_password2')
+
+
+class GameCommentForm(forms.ModelForm):
+    class Meta:
+        model = GameComment
+        fields = ('content',)
+        widgets = {
+            'content': forms.Textarea(
+                attrs={
+                    'cols': 40,
+                    'rows': 5,
+                    'placeholder': 'Add comment...',
+                },
+            ),
+        }
