@@ -11,27 +11,38 @@
 </header>
 <ul>
     <li>
-        {{ game_details.title }}
+        {{ game.title }}
     </li>
     <li>
-        <img src="/media/{{ game_details.image }}" alt="temp-default.jpg" width="50" height="50">
+        <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
     </li>
-    {% for commment in comments %}
-        {% if commment.game_id == game_details.pk %}
-            <li>
-                {{ commment.content }}
-            </li>
+    <li>
+        {{ average }}
+    </li>
+    <li>
+        {% if personal_rating == 11 %}
+            <form method="post" action="{% url 'rate game' game.pk %} " enctype="multipart/form-data">
+                {{ rating_form.as_p }}
+                <button>Rate</button>{% csrf_token %}
+            </form>
+        {% else %}
+            {{ personal_rating }}
         {% endif %}
+    </li>
+    {% for comment in game_comments %}
+        <li>
+            {{ comment.content }}
+        </li>
     {% endfor %}
     <li>
-        {% if game_details.pk not in ids %}
-            <form method="post" action="{% url 'comment game'  game_details.pk %} " enctype="multipart/form-data">
+        {% if has_commented %}
+            You have already commented!
+        {% else %}
+            <form method="post" action="{% url 'comment game'  game.pk %} " enctype="multipart/form-data">
                 {{ comment_form.as_p }}
                 <button>Comment</button>
                 {% csrf_token %}
             </form>
-        {% else %}
-            <li>You've already commented!</li>
         {% endif %}
     </li>
 </ul>

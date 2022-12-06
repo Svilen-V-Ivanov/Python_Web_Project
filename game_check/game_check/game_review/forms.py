@@ -1,6 +1,6 @@
 from django.contrib.auth import forms as auth_forms, get_user_model
 from django import forms
-from game_check.game_review.models import Profile, GameComment
+from game_check.game_review.models import Profile, GameComment, GameScore
 from game_check.game_review.validators import age_validator
 
 UserModel = get_user_model()
@@ -55,3 +55,9 @@ class GameCommentForm(forms.ModelForm):
                 },
             ),
         }
+
+
+class GameRatingForm(forms.ModelForm):
+    class Meta:
+        model = GameScore
+        fields = ('value',)

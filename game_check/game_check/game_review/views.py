@@ -3,9 +3,9 @@ from django.urls import reverse_lazy
 from django.views import generic as views
 from django.contrib.auth import views as auth_views, login, get_user_model, mixins as auth_mixins
 
-from game_check.game_review.forms import SignUpForm, ChangeUserPasswordForm, GameCommentForm
-from game_check.game_review.models import Profile, Game, GameComment
-from game_check.game_review.utils import get_all_user_comments_id
+from game_check.game_review.forms import SignUpForm, ChangeUserPasswordForm, GameCommentForm, GameRatingForm
+from game_check.game_review.models import Profile, Game, GameComment, GameScore
+from game_check.game_review.utils import get_game_by_id, get_has_commented, get_rating, get_average_rating
 
 UserModel = get_user_model()
 
@@ -102,25 +102,41 @@ class OtherProfileView(views.DetailView):
 class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):
     template_name = 'create-game.html'
     model = Game
-    fields = '__all__'
+    fields = ('title', 'image')
     success_url = reverse_lazy('index')
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(GameCreateView, self).form_valid(form)
 
-class GameDetailsView(views.DetailView):
-    context_object_name = 'game_details'
-    model = Game
+
+def games_details(request, pk):
+    current_game = get_game_by_id(Game, pk)
+    current_user_id = request.user.pk
+
     comment_form = GameCommentForm()
-    comments = GameComment.objects.all()
-    # TODO: fix the way it's filtering( somehow add game 'pk' as well, since only user+game is unique
-    comment_ids = get_all_user_comments_id(comments)
-    template_name = 'details-game.html'
-    success_url = reverse_lazy('index')
+    rating_form = GameRatingForm()
 
-    extra_context = {
+    comments = GameComment.objects.all()
+    current_game_comments = GameComment.objects.filter(game_id=current_game.pk)
+    has_commented = get_has_commented(comments, current_user_id, current_game)
+
+    ratings = GameScore.objects.all()
+    current_user_rating = get_rating(ratings, current_user_id, current_game)
+    average_rating = get_average_rating(ratings)
+
+    context = {
+        'game': current_game,
+        'user_id': current_user_id,
         'comment_form': comment_form,
-        'comments': comments,
-        'ids': comment_ids,
+        'rating_form': rating_form,
+        'has_commented': has_commented,
+        'game_comments': current_game_comments,
+        'personal_rating': current_user_rating,
+        'average': average_rating,
     }
+
+    return render(request, 'details-game.html', context)
 
 
 # TODO: Make it log in required
@@ -128,6 +144,7 @@ def comment_game(request, pk):
     game = Game.objects.filter(pk=pk) \
         .get()
     current_user = request.user
+    game_id = game.pk
 
     form = GameCommentForm(request.POST)
 
@@ -136,5 +153,20 @@ def comment_game(request, pk):
         comment.game = game
         comment.user = current_user
         comment.save()
-        return redirect('index')
+        return redirect('details game', game_id)
 
+
+def rate_game(request, pk):
+    game = Game.objects.filter(pk=pk) \
+        .get()
+    current_user = request.user
+    game_id = game.pk
+
+    form = GameRatingForm(request.POST)
+
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.game = game
+        comment.user = current_user
+        comment.save()
+        return redirect('details game', game_id)

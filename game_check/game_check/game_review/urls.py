@@ -1,9 +1,8 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import path, include
 
 from game_check.game_review.views import UserSignUpView, UserSignInView, ProfileView, UserSignOutView, \
-    UserDetailsView, UserEditView, PasswordEditView, EmailEditView, GameCreateView, index, GameDetailsView, comment_game
+    UserDetailsView, UserEditView, PasswordEditView, EmailEditView, GameCreateView, index, \
+    comment_game, games_details, rate_game
 
 urlpatterns = (
     path('', index, name='index'),
@@ -25,8 +24,9 @@ urlpatterns = (
     ])),
     path('game/', include([
         path('', GameCreateView.as_view(), name='create game'),
-        path('details/<int:pk>/', GameDetailsView.as_view(), name='details game'),
+        path('details/<int:pk>/', games_details, name='details game'),
         path('details/comment/<int:pk>/', comment_game, name='comment game'),
+        path('details/rating/<int:pk>/', rate_game, name='rate game'),
     ])),
 )
 

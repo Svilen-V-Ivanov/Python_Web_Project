@@ -126,6 +126,11 @@ class Game(models.Model):
 
     )
 
+    user = models.ForeignKey(
+        SiteUser,
+        on_delete=models.RESTRICT,
+    )
+
 
 class GameScore(models.Model):
 
