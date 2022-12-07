@@ -20,13 +20,38 @@
         {{ average }}
     </li>
     <li>
+        {% if not user_favourite or user_favourite.is_favourite == False %}
+            False
+        {% else %}
+            True
+        {% endif %}
+    </li>
+    <li>
+        {% if not user_favourite %}
+            <form method="post" action="{% url 'favourite game'  game.pk %} " enctype="multipart/form-data">
+                {{ favourite_form.as_p }}
+                <button>Favourite!</button>
+                {% csrf_token %}
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'favourite game'  game.pk %} " enctype="multipart/form-data">
+                {{ edit_favourite.as_p }}
+                <button>Edit Favourite!</button>
+                {% csrf_token %}
+            </form>
+        {% endif %}
+    </li>
+    <li>
         {% if personal_rating == 11 %}
             <form method="post" action="{% url 'rate game' game.pk %} " enctype="multipart/form-data">
                 {{ rating_form.as_p }}
                 <button>Rate</button>{% csrf_token %}
             </form>
         {% else %}
-            {{ personal_rating }}
+            <form method="post" action="{% url 'rate game' game.pk %} " enctype="multipart/form-data">
+                {{ edit_rating.as_p }}
+                <button>Edit Rating</button>{% csrf_token %}
+            </form>
         {% endif %}
     </li>
     {% for comment in game_comments %}
@@ -35,8 +60,13 @@
         </li>
     {% endfor %}
     <li>
+    {# TODO: If enough time try and get the data to be shown correctly on edit #}
         {% if has_commented %}
-            You have already commented!
+            <form method="post" action="{% url 'comment game'  game.pk %} " enctype="multipart/form-data">
+                {{ edit_comment.as_p }}
+                <button>Edit</button>
+                {% csrf_token %}
+            </form>
         {% else %}
             <form method="post" action="{% url 'comment game'  game.pk %} " enctype="multipart/form-data">
                 {{ comment_form.as_p }}

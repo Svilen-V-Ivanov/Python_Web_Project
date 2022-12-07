@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic as views
 from django.contrib.auth import views as auth_views, login, get_user_model, mixins as auth_mixins
 
-from game_check.game_review.forms import SignUpForm, ChangeUserPasswordForm, GameCommentForm, GameRatingForm
-from game_check.game_review.models import Profile, Game, GameComment, GameScore
-from game_check.game_review.utils import get_game_by_id, get_has_commented, get_rating, get_average_rating
+from game_check.game_review.forms import SignUpForm, ChangeUserPasswordForm, GameCommentForm, GameRatingForm, \
+    GameFavouriteForm, CommentEditForm, RatingEditForm, EditFavouriteForm
+from game_check.game_review.models import Profile, Game, GameComment, GameScore, GameFavourite
+from game_check.game_review.utils import get_game_by_id, get_has_commented, get_rating, get_average_rating, \
+    get_current_favourite, get_comment, get_current_rating, get_reviewed_games, get_favourite_games, get_len
 
 UserModel = get_user_model()
 
@@ -59,6 +61,37 @@ class ProfileView(auth_mixins.LoginRequiredMixin, views.ListView):
     template_name = 'info-profile.html'
 
 
+def profile_reviewed_games(request, slug, pk):
+    user = request.user
+    user_scores = GameScore.objects.filter(user_id=pk)
+    user_comments = GameComment.objects.filter(user_id=pk)
+    all_games = Game.objects.all()
+    reviewed_games = get_reviewed_games(all_games, user_scores, user_comments, user)
+    game_len = get_len(reviewed_games)
+
+    context = {
+        'games': reviewed_games,
+        'len': game_len,
+    }
+
+    return render(request, 'reviewed-games.html', context)
+
+
+def profile_favourite_games(request, slug, pk):
+    user = request.user
+    user_favourites = GameFavourite.objects.filter(user_id=pk)
+    all_games = Game.objects.all()
+    favourite_games = get_favourite_games(all_games, user_favourites, user)
+    game_len = get_len(favourite_games)
+
+    context = {
+        'games': favourite_games,
+        'len': game_len,
+    }
+
+    return render(request, 'favourite-games.html', context)
+
+
 class UserDetailsView(views.DetailView):
     context_object_name = 'user_details'
     model = Profile
@@ -81,6 +114,7 @@ class UserEditView(views.UpdateView):
     #     return result
 
 
+# TODO : Fix redirect on password change or make changes to 'index.html'
 class PasswordEditView(auth_views.PasswordChangeView):
     form_class = ChangeUserPasswordForm
     template_name = 'edit_password.html'
@@ -115,7 +149,11 @@ def games_details(request, pk):
     current_user_id = request.user.pk
 
     comment_form = GameCommentForm()
+    comment_edit = CommentEditForm()
     rating_form = GameRatingForm()
+    rating_edit = RatingEditForm()
+    favourite_form = GameFavouriteForm()
+    edit_favourite = EditFavouriteForm()
 
     comments = GameComment.objects.all()
     current_game_comments = GameComment.objects.filter(game_id=current_game.pk)
@@ -123,17 +161,27 @@ def games_details(request, pk):
 
     ratings = GameScore.objects.all()
     current_user_rating = get_rating(ratings, current_user_id, current_game)
-    average_rating = get_average_rating(ratings)
+    average_rating = get_average_rating(ratings, current_game)
+
+    favourites = GameFavourite.objects.all()
+    user_favourite = get_current_favourite(favourites, current_user_id, current_game)
 
     context = {
         'game': current_game,
         'user_id': current_user_id,
+
         'comment_form': comment_form,
+        'edit_comment': comment_edit,
         'rating_form': rating_form,
+        'edit_rating': rating_edit,
+        'favourite_form': favourite_form,
+        'edit_favourite': edit_favourite,
+
         'has_commented': has_commented,
         'game_comments': current_game_comments,
         'personal_rating': current_user_rating,
         'average': average_rating,
+        'user_favourite': user_favourite,
     }
 
     return render(request, 'details-game.html', context)
@@ -141,32 +189,73 @@ def games_details(request, pk):
 
 # TODO: Make it log in required
 def comment_game(request, pk):
-    game = Game.objects.filter(pk=pk) \
-        .get()
+    game = get_game_by_id(Game, pk)
     current_user = request.user
     game_id = game.pk
+    comments = GameComment.objects.all()
+    current_comment = get_comment(comments, current_user, game)
 
-    form = GameCommentForm(request.POST)
-
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.game = game
-        comment.user = current_user
-        comment.save()
-        return redirect('details game', game_id)
+    if request.method == 'POST':
+        if not current_comment:
+            form = GameCommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.game = game
+                comment.user = current_user
+                comment.save()
+                return redirect('details game', game_id)
+        else:
+            form = CommentEditForm(request.POST, instance=current_comment)
+            if form.is_valid():
+                form.save()
+                return redirect('details game', game_id)
 
 
 def rate_game(request, pk):
-    game = Game.objects.filter(pk=pk) \
-        .get()
+    game = get_game_by_id(Game, pk)
     current_user = request.user
     game_id = game.pk
+    ratings = GameScore.objects.all()
+    current_rating = get_current_rating(ratings, current_user, game)
 
-    form = GameRatingForm(request.POST)
+    if request.method == 'POST':
+        if not current_rating:
+            form = GameRatingForm(request.POST)
 
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.game = game
-        comment.user = current_user
-        comment.save()
-        return redirect('details game', game_id)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.game = game
+                comment.user = current_user
+                comment.save()
+                return redirect('details game', game_id)
+        else:
+            form = RatingEditForm(request.POST, instance=current_rating)
+            if form.is_valid():
+                form.save()
+                return redirect('details game', game_id)
+
+
+def favourite_game(request, pk):
+    game = get_game_by_id(Game, pk)
+    current_user = request.user
+    game_id = game.pk
+    favourites = GameFavourite.objects.all()
+    user_favourite = get_current_favourite(favourites, current_user.pk, game)
+
+    if request.method == "POST":
+        if not user_favourite:
+            form = GameFavouriteForm(request.POST)
+
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.game = game
+                comment.user = current_user
+                comment.save()
+                return redirect('details game', game_id)
+        else:
+            form = EditFavouriteForm(request.POST, instance=user_favourite)
+            if form.is_valid():
+                form.save()
+                return redirect('details game', game_id)
+
+

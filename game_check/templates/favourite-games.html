@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GameCheck</title>
+</head>
+<body>
+
+<header>
+    {% include 'nav.html' %}
+</header>
+
+<ul>
+    {% if len == 0 %}
+        No Favourite Games!
+    {% else %}
+        {% for game in games %}
+            <li>
+                <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
+            </li>
+            <li>
+                {{ game.title }}
+            </li>
+        {% endfor %}
+    {% endif %}
+</ul>
+</body>
+</html>

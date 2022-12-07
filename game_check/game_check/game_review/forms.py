@@ -1,6 +1,6 @@
 from django.contrib.auth import forms as auth_forms, get_user_model
 from django import forms
-from game_check.game_review.models import Profile, GameComment, GameScore
+from game_check.game_review.models import Profile, GameComment, GameScore, GameFavourite
 from game_check.game_review.validators import age_validator
 
 UserModel = get_user_model()
@@ -35,7 +35,6 @@ class SignUpForm(auth_forms.UserCreationForm):
         return user
 
 
-# TODO: Finish form and view for change password
 class ChangeUserPasswordForm(auth_forms.PasswordChangeForm):
     class Meta:
         model = UserModel
@@ -57,7 +56,44 @@ class GameCommentForm(forms.ModelForm):
         }
 
 
-class GameRatingForm(forms.ModelForm):
+class CommentEditForm(forms.ModelForm):
+    class Meta:
+        model = GameComment
+        fields = ('content',)
+        widgets = {
+            'content': forms.Textarea(
+                attrs={
+                    'cols': 40,
+                    'rows': 5,
+                    'placeholder': 'Edit comment...',
+                },
+            ),
+        }
+
+
+class BaseRatingForm(forms.ModelForm):
     class Meta:
         model = GameScore
         fields = ('value',)
+
+
+class GameRatingForm(BaseRatingForm):
+    pass
+
+
+class RatingEditForm(BaseRatingForm):
+    pass
+
+
+class BaseFavouriteForm(forms.ModelForm):
+    class Meta:
+        model = GameFavourite
+        fields = ('is_favourite',)
+
+
+class GameFavouriteForm(BaseFavouriteForm):
+    pass
+
+
+class EditFavouriteForm(BaseFavouriteForm):
+    pass

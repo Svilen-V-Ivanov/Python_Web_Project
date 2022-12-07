@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from game_check.game_review.views import UserSignUpView, UserSignInView, ProfileView, UserSignOutView, \
     UserDetailsView, UserEditView, PasswordEditView, EmailEditView, GameCreateView, index, \
-    comment_game, games_details, rate_game
+    comment_game, games_details, rate_game, favourite_game, profile_reviewed_games, profile_favourite_games
 
 urlpatterns = (
     path('', index, name='index'),
@@ -17,16 +17,20 @@ urlpatterns = (
             path('password/', PasswordEditView.as_view(), name='edit password'),
             path('email/', EmailEditView.as_view(), name='edit email'),
         ])),
-        # path('games/', include([
-        #     path('reviewed/', GamesReviewedView.as_view(), name='reviewed games'),
-        #     path('favourite/', GamesFavouriteView.as_view(), name='favourite games'),
-        # ])),
+        path('games/', include([
+            path('reviewed/', profile_reviewed_games, name='reviewed games'),
+            path('favourite/', profile_favourite_games, name='favourite games'),
+        ])),
     ])),
     path('game/', include([
         path('', GameCreateView.as_view(), name='create game'),
-        path('details/<int:pk>/', games_details, name='details game'),
-        path('details/comment/<int:pk>/', comment_game, name='comment game'),
-        path('details/rating/<int:pk>/', rate_game, name='rate game'),
+        path('details/', include([
+            path('<int:pk>/', games_details, name='details game'),
+            path('comment/<int:pk>/', comment_game, name='comment game'),
+            path('comment/edit/<int:pk>/', comment_game, name='edit comment'),
+            path('rating/<int:pk>/', rate_game, name='rate game'),
+            path('favourite/<int:pk>/', favourite_game, name='favourite game'),
+        ])),
     ])),
 )
 
