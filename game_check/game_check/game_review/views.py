@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic as views
@@ -45,7 +46,7 @@ class UserSignInView(auth_views.LoginView):
         return self.get_redirect_url() or self.get_default_redirect_url()
 
 
-class UserSignOutView(auth_views.LogoutView):
+class UserSignOutView(auth_mixins.LoginRequiredMixin, auth_views.LogoutView):
     template_name = 'sign-out-user.html'
     success_url = reverse_lazy('index')
 
@@ -61,6 +62,7 @@ class ProfileView(auth_mixins.LoginRequiredMixin, views.ListView):
     template_name = 'info-profile.html'
 
 
+@login_required
 def profile_reviewed_games(request, slug, pk):
     user = request.user
     user_scores = GameScore.objects.filter(user_id=pk)
@@ -77,6 +79,7 @@ def profile_reviewed_games(request, slug, pk):
     return render(request, 'reviewed-games.html', context)
 
 
+@login_required
 def profile_favourite_games(request, slug, pk):
     user = request.user
     user_favourites = GameFavourite.objects.filter(user_id=pk)
@@ -92,13 +95,13 @@ def profile_favourite_games(request, slug, pk):
     return render(request, 'favourite-games.html', context)
 
 
-class UserDetailsView(views.DetailView):
+class UserDetailsView(auth_mixins.LoginRequiredMixin, views.DetailView):
     context_object_name = 'user_details'
     model = Profile
     template_name = 'details-profile.html'
 
 
-class UserEditView(views.UpdateView):
+class UserEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     model = Profile
     fields = ('avatar', 'name', 'age', 'gender', 'bio')
     template_name = 'edit-profile.html'
@@ -115,20 +118,21 @@ class UserEditView(views.UpdateView):
 
 
 # TODO : Fix redirect on password change or make changes to 'index.html'
-class PasswordEditView(auth_views.PasswordChangeView):
+class PasswordEditView(auth_mixins.LoginRequiredMixin, auth_views.PasswordChangeView):
     form_class = ChangeUserPasswordForm
     template_name = 'edit_password.html'
     success_url = reverse_lazy('index')
 
 
 # TODO: Maybe make changing email look a bit better, also if enough time add signal to send email for email change
-class EmailEditView(views.UpdateView):
+class EmailEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     model = UserModel
     fields = ('email',)
     template_name = 'edit-email.html'
     success_url = reverse_lazy('index')
 
 
+# TODO: make this view
 class OtherProfileView(views.DetailView):
     pass
 
@@ -144,6 +148,7 @@ class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):
         return super(GameCreateView, self).form_valid(form)
 
 
+@login_required()
 def games_details(request, pk):
     current_game = get_game_by_id(Game, pk)
     current_user_id = request.user.pk
@@ -187,7 +192,7 @@ def games_details(request, pk):
     return render(request, 'details-game.html', context)
 
 
-# TODO: Make it log in required
+@login_required
 def comment_game(request, pk):
     game = get_game_by_id(Game, pk)
     current_user = request.user
@@ -211,6 +216,7 @@ def comment_game(request, pk):
                 return redirect('details game', game_id)
 
 
+@login_required
 def rate_game(request, pk):
     game = get_game_by_id(Game, pk)
     current_user = request.user
@@ -235,6 +241,7 @@ def rate_game(request, pk):
                 return redirect('details game', game_id)
 
 
+@login_required
 def favourite_game(request, pk):
     game = get_game_by_id(Game, pk)
     current_user = request.user

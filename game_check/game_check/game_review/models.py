@@ -54,6 +54,16 @@ class SiteUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
         unique=True,
     )
 
+    is_staff = models.BooleanField(
+        default=False,
+        null=False,
+        blank=False,
+    )
+
+    date_joined = models.DateTimeField(
+        auto_now_add=True,
+    )
+
     def save(self, *args, **kwargs):
         if not self.id:
             self.slug = slugify(self.username)
@@ -109,6 +119,8 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        return f"{self.name}"
 
 class Game(models.Model):
     MAX_TITLE_LEN = 100
@@ -130,6 +142,9 @@ class Game(models.Model):
         SiteUser,
         on_delete=models.RESTRICT,
     )
+
+    def __str__(self):
+        return f"{self.title}"
 
 
 class GameScore(models.Model):
@@ -154,6 +169,9 @@ class GameScore(models.Model):
         on_delete=models.RESTRICT,
     )
 
+    def __str__(self):
+        return f"{self.user.username}/{self.game.title}"
+
 
 class GameComment(models.Model):
     MAX_LEN_CONT = 250
@@ -177,6 +195,9 @@ class GameComment(models.Model):
         related_name='comments',
     )
 
+    def __str__(self):
+        return f"{self.user.username}/{self.game.title}"
+
 
 class GameFavourite(models.Model):
     is_favourite = models.BooleanField(default=False)
@@ -190,3 +211,6 @@ class GameFavourite(models.Model):
         Game,
         on_delete=models.RESTRICT,
     )
+
+    def __str__(self):
+        return f"{self.user.username}/{self.game.title}"
