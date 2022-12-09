@@ -20,10 +20,6 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-# class IndexView(views.TemplateView):
-#     template_name = 'index.html'
-
-
 class UserSignUpView(views.CreateView):
     template_name = 'sign-up-user.html'
     form_class = SignUpForm
@@ -54,12 +50,6 @@ class UserSignOutView(auth_mixins.LoginRequiredMixin, auth_views.LogoutView):
         if self.success_url:
             return self.success_url
         return self.get_redirect_url() or self.get_default_redirect_url()
-
-
-class ProfileView(auth_mixins.LoginRequiredMixin, views.ListView):
-    context_object_name = 'profile'
-    model = Profile
-    template_name = 'info-profile.html'
 
 
 @login_required
@@ -264,5 +254,4 @@ def favourite_game(request, pk):
             if form.is_valid():
                 form.save()
                 return redirect('details game', game_id)
-
 

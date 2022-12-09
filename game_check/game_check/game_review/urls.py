@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from game_check.game_review.views import UserSignUpView, UserSignInView, ProfileView, UserSignOutView, \
+from game_check.game_review.views import UserSignUpView, UserSignInView, UserSignOutView, \
     UserDetailsView, UserEditView, PasswordEditView, EmailEditView, GameCreateView, index, \
     comment_game, games_details, rate_game, favourite_game, profile_reviewed_games, profile_favourite_games
 
@@ -10,7 +10,6 @@ urlpatterns = (
     path('sign-in/', UserSignInView.as_view(), name='sign in user'),
     path('sign-out/', UserSignOutView.as_view(), name='sign out user'),
     path('profile/<slug:slug>/<int:pk>/', include([
-        path('', ProfileView.as_view(), name='profile'),
         path('details/', include([
             path('', UserDetailsView.as_view(), name='details profile'),
             path('edit/', UserEditView.as_view(), name='edit profile'),
