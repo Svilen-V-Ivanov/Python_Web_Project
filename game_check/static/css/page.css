@@ -1,0 +1,151 @@
+body, html {
+    height: auto;
+    margin: 0;
+}
+
+.bg {
+    background-image: url("/static/images/egde.jpg");
+    height: auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.elements {
+    height: 125vh;
+    margin-top: 60px;
+    margin-left: 300px;
+}
+
+.box {
+    width: 200px;
+    border: 15px solid lightgrey;
+    border-radius: 15px;
+    padding: 25px;
+    margin: 50px;
+    color: white;
+}
+
+.box a {
+    color: white;
+    font-style: italic;
+}
+
+.inline-order {
+    display: flex;
+}
+
+.small-box {
+    width: 100px;
+    border: 15px solid lightgreen;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 50px;
+    color: white;
+}
+
+.small-box a {
+    color: white;
+    font-style: italic;
+    text-decoration: none;
+}
+
+.big-box {
+    width: 300px;
+    border: 15px solid lightgreen;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 50px;
+    color: white;
+}
+
+.big-box a {
+    color: white;
+    font-style: italic;
+    text-decoration: none;
+}
+
+.big-box li {
+    float: left;
+    color: white;
+    text-align: left;
+    padding: 2px 2px;
+    text-decoration: none;
+    font-size: 24px;
+    font-style: italic;
+}
+
+.game-box {
+    width: 450px;
+    border: 15px solid lightgreen;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 50px;
+    color: white;
+}
+
+.game-box a {
+    color: white;
+    font-style: italic;
+    text-decoration: none;
+}
+
+.game-box li {
+    float: left;
+    color: white;
+    text-align: left;
+    padding: 2px 2px;
+    text-decoration: none;
+    font-size: 24px;
+    font-style: italic;
+}
+.button {
+    background-color: lightgreen; /* Green */
+    border: none;
+    border-radius: 25px;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+
+
+.scrolldiv {
+    margin:4px;
+    padding:4px;
+    height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-align:justify;
+}
+
+.comment-box {
+    display: flex;
+    width: 250px;
+    border: 5px solid lightgreen;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 5px;
+    color: white;
+}
+
+.comment-box li {
+    float: left;
+    color: white;
+    text-align: left;
+    padding: 2px 2px;
+    text-decoration: none;
+    font-size: 24px;
+    font-style: italic;
+}
+
+.label {
+    background-color: transparent;
+}
+
+.color-light-green {
+    color: lightgreen;
+}

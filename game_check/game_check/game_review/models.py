@@ -122,12 +122,14 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+
 class Game(models.Model):
     MAX_TITLE_LEN = 100
     MAX_LEN_TEXT = 250
 
     title = models.CharField(
         max_length=MAX_TITLE_LEN,
+        unique=True,
     )
 
     image = models.ImageField(
@@ -146,6 +148,9 @@ class Game(models.Model):
     def __str__(self):
         return f"{self.title}"
 
+    class Meta:
+        ordering = ('title', )
+
 
 class GameScore(models.Model):
 
@@ -155,6 +160,7 @@ class GameScore(models.Model):
         ),
         null=False,
         blank=False,
+        verbose_name='',
     )
 
     user = models.ForeignKey(
@@ -180,6 +186,11 @@ class GameComment(models.Model):
         max_length=MAX_LEN_CONT,
         null=True,
         blank=True,
+        verbose_name='',
+    )
+
+    date_created = models.DateTimeField(
+        auto_now_add=True,
     )
 
     user = models.ForeignKey(
@@ -200,7 +211,7 @@ class GameComment(models.Model):
 
 
 class GameFavourite(models.Model):
-    is_favourite = models.BooleanField(default=False)
+    is_favourite = models.BooleanField(default=False, verbose_name='')
 
     user = models.ForeignKey(
         SiteUser,

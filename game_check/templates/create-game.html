@@ -1,21 +1,23 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg">
 <head>
     <meta charset="UTF-8">
     <title>GameCheck</title>
 </head>
-<body>
-
+<body class="elements">
+<link rel="stylesheet" href="{% static 'css/page.css' %}">
 <header>
     {% include 'nav.html' %}
 </header>
 
-
-<form method="post" action="{% url 'create game' %} " enctype="multipart/form-data">
-    {{ form.as_p }}
-    <button>Create</button>
-    {% csrf_token %}
-</form>
-
+<div class="big-box">
+    <p>ADD GAME</p>
+    <form method="post" action="{% url 'create game' %} " enctype="multipart/form-data">
+        {{ form.as_p }}
+        <button class="button">Create</button>
+        {% csrf_token %}
+    </form>
+</div>
 </body>
 </html>
