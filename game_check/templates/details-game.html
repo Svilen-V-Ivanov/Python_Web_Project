@@ -11,72 +11,81 @@
     {% include 'nav.html' %}
 </header>
 <link rel="stylesheet" href="{% static 'css/page.css' %}">
-<div class="game-box">
+{% if request.user.is_authenticated %}
+    <div class="game-box">
 
-    <p><img src="/media/{{ game.image }}" alt="temp-default.jpg" width="125" height="125"></p>
+        <p><img src="/media/{{ game.image }}" alt="temp-default.jpg" width="125" height="125"></p>
 
-    <p>{{ game.title }}</p>
+        <p>{{ game.title }}</p>
 
-    <p class="color-light-green">Score:{{ average }}/10.0</p>
+        <p>Score:{{ average }}/10.0</p>
+        {% if personal_rating == 11 %}
+            <p>Your Score:0.0/10.0</p>
+        {% else %}
+            <p>Your Score:{{ personal_rating }}/10.0</p>
+        {% endif %}
 
-    {% if not user_favourite or user_favourite.is_favourite == False %}
+        {% if not user_favourite or user_favourite.is_favourite == False %}
 
-    {% else %}
-        <img src="/static/images/star-profile.png" alt="Default" width="25" height="25">
-    {% endif %}
+        {% else %}
+            <img src="/static/images/star-profile.png" alt="Default" width="25" height="25">
+        {% endif %}
 
-    {% if not user_favourite %}
-        <form method="post" action="{% url 'favourite game'  game.pk %} " enctype="multipart/form-data">
-            {{ favourite_form }}
-            <button class="button">Fav</button>
-            {% csrf_token %}
-        </form>
-    {% else %}
-        <form method="post" action="{% url 'favourite game'  game.pk %} " enctype="multipart/form-data">
-            {{ edit_favourite.as_p }}
-            <button class="button">Fav</button>
-            {% csrf_token %}
-        </form>
-    {% endif %}
+        {% if not user_favourite %}
+            <a class="button" href="{% url 'favourite game' pk=game.pk %}">Add Fav</a>
+        {% else %}
+            <a class="button" href="{% url 'favourite game' pk=game.pk %}">Edit Fav</a>
+        {% endif %}
 
-    {% if personal_rating == 11 %}
-        <form method="post" action="{% url 'rate game' game.pk %} " enctype="multipart/form-data">
-            {{ rating_form.as_p }}
-            <button class="button">Rate</button>
-            {% csrf_token %}
-        </form>
-    {% else %}
-        <form method="post" action="{% url 'rate game' game.pk %} " enctype="multipart/form-data">
-            {{ edit_rating.as_p }}
-            <button class="button">Edit Rating</button>
-            {% csrf_token %}
-        </form>
-    {% endif %}
-    <div class="scrolldiv">
-        {% for comment in game_comments %}
-            <div class="inline-order">
-                <div class="comment-box">
-                    {{ comment.user }} - {{ comment.date_created }}
-                    {{ comment.content }}
+        {% if personal_rating == 11 %}
+            <a class="button" href="{% url 'rate game' pk=game.pk %}">Rate</a>
+        {% else %}
+            <a class="button" href="{% url 'rate game' pk=game.pk %}">Edit Rating</a>
+        {% endif %}
+        <div class="scrolldiv">
+            {% for comment in game_comments %}
+                <div class="inline-order">
+                    <div class="comment-box">
+                        {{ comment.user }} - {{ comment.date_created }} -
+                        {{ comment.content }}
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
-    {# TODO: If enough time try and get the data to be shown correctly on edit #}
-    {% if has_commented %}
-        <form method="post" action="{% url 'comment game'  game.pk %} " enctype="multipart/form-data">
-            {{ edit_comment.as_p }}
-            <button class="button">Edit</button>
-            {% csrf_token %}
-        </form>
-    {% else %}
-        <form method="post" action="{% url 'comment game'  game.pk %} " enctype="multipart/form-data">
-            {{ comment_form.as_p }}
-            <button class="button">Comment</button>
-            {% csrf_token %}
-        </form>
-    {% endif %}
+            {% endfor %}
+        </div>
 
-</div>
+        {% if has_commented %}
+            <a class="button" href="{% url 'edit comment' pk=game.pk %}">Edit Comment</a>
+            <a class="button" href="{% url 'delete comment' pk=game.pk %}">Delete Comment</a>
+        {% else %}
+            <a class="button" href="{% url 'comment game' pk=game.pk %}">Comment</a>
+        {% endif %}
+
+    </div>
+{% else %}
+    <div class="small-box">
+        <a class="button" href="{% url 'sign up user' %}">
+                Create Account!
+            </a>
+    </div>
+    <div class="game-box">
+
+        <p><img src="/media/{{ game.image }}" alt="temp-default.jpg" width="125" height="125"></p>
+
+        <p>{{ game.title }}</p>
+
+        <p>Score:{{ average }}/10.0</p>
+
+        <div class="scrolldiv">
+            {% for comment in game_comments %}
+                <div class="inline-order">
+                    <div class="comment-box">
+                        {{ comment.user }} - {{ comment.date_created }} -
+                        {{ comment.content }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
 </body>
 </html>

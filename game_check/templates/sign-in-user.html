@@ -1,7 +1,31 @@
-<h1>Sign in!</h1>
-<form method="post" action="{% url 'sign in user' %}">
-    {{ form.as_p }}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>GameCheck</title>
+</head>
+<body class="elements">
+<link rel="stylesheet" href="{% static 'css/page.css' %}">
+<header>
+    {% include 'nav.html' %}
+</header>
+<div class="game-box">
+    <p class="font-size-24">Sign In:</p>
+    <form method="post" action="{% url 'sign in user' %}">
+        {{ form.as_p }}
 
-    <button>Sign in:</button>
-    {% csrf_token %}
-</form>
+        <button class="button">Sign in</button>
+        {% csrf_token %}
+    </form>
+</div>
+</body>
+</html>
+
+{#<h1>Sign in!</h1>#}
+{#<form method="post" action="{% url 'sign in user' %}">#}
+{#    {{ form.as_p }}#}
+{##}
+{#    <button>Sign in:</button>#}
+{#    {% csrf_token %}#}
+{#</form>#}

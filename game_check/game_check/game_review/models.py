@@ -209,6 +209,9 @@ class GameComment(models.Model):
     def __str__(self):
         return f"{self.user.username}/{self.game.title}"
 
+    class Meta:
+        ordering = ('date_created', )
+
 
 class GameFavourite(models.Model):
     is_favourite = models.BooleanField(default=False, verbose_name='')

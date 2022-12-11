@@ -14,7 +14,9 @@
 <div class="inline-order">
 
     {% if len == 0 %}
-        No Favourite Games!
+        <div class="box">
+            <p class="font-size-24">No Favourite Games!</p>
+        </div>
     {% else %}
         {% for game in games %}
             <div class="box">
@@ -25,7 +27,7 @@
                     {{ game.title }}
                 </p>
                 <p>
-                    <a href="{% url 'details game' pk=game.pk %}">Details game</a>
+                    <a class='button' href="{% url 'details game' pk=game.pk %}">Details game</a>
                 </p>
             </div>
             {% if forloop.counter|divisibleby:4 %}

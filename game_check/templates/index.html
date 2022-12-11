@@ -27,7 +27,7 @@
                 {{ game.title }}
             </p>
             <p>
-                <a href="{% url 'details game' pk=game.pk %}">Details game</a>
+                <a class="button" href="{% url 'details game' pk=game.pk %}">Details game</a>
             </p>
         </div>
         {% if forloop.counter|divisibleby:4 %}
@@ -39,23 +39,3 @@
 </body>
 </html>
 
-
-{#<ul>#}
-{#    {% for game in games %}#}
-{#        <div class="box">#}
-{#            <p>#}
-{#                {{ game.title }}#}
-{#            </p>#}
-{#            <p>#}
-{#                <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">#}
-{#            </p>#}
-{#            <p>#}
-{#                <a href="{% url 'details game' pk=game.pk %}">Details game</a>#}
-{#            </p>#}
-{#        </div>#}
-{#        {% if forloop.counter|divisibleby:3 %}#}
-{#            </ul>#}
-{#            <div class="row">#}
-{#        {% endif %}#}
-{#    {% endfor %}#}
-{#    </div>#}

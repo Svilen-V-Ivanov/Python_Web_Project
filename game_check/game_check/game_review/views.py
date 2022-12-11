@@ -138,17 +138,12 @@ class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):
         return super(GameCreateView, self).form_valid(form)
 
 
-@login_required()
 def games_details(request, pk):
     current_game = get_game_by_id(Game, pk)
     current_user_id = request.user.pk
 
     comment_form = GameCommentForm()
     comment_edit = CommentEditForm()
-    rating_form = GameRatingForm()
-    rating_edit = RatingEditForm()
-    favourite_form = GameFavouriteForm()
-    edit_favourite = EditFavouriteForm()
 
     comments = GameComment.objects.all()
     current_game_comments = GameComment.objects.filter(game_id=current_game.pk)
@@ -167,10 +162,6 @@ def games_details(request, pk):
 
         'comment_form': comment_form,
         'edit_comment': comment_edit,
-        'rating_form': rating_form,
-        'edit_rating': rating_edit,
-        'favourite_form': favourite_form,
-        'edit_favourite': edit_favourite,
 
         'has_commented': has_commented,
         'game_comments': current_game_comments,
@@ -187,23 +178,92 @@ def comment_game(request, pk):
     game = get_game_by_id(Game, pk)
     current_user = request.user
     game_id = game.pk
-    comments = GameComment.objects.all()
-    current_comment = get_comment(comments, current_user, game)
 
-    if request.method == 'POST':
-        if not current_comment:
-            form = GameCommentForm(request.POST)
-            if form.is_valid():
-                comment = form.save(commit=False)
-                comment.game = game
-                comment.user = current_user
-                comment.save()
-                return redirect('details game', game_id)
-        else:
-            form = CommentEditForm(request.POST, instance=current_comment)
-            if form.is_valid():
-                form.save()
-                return redirect('details game', game_id)
+    ratings = GameScore.objects.all()
+    current_user_rating = get_rating(ratings, current_user.pk, game)
+    average_rating = get_average_rating(ratings, game)
+
+    comments = GameComment.objects.all()
+    current_game_comments = GameComment.objects.filter(game_id=game.pk)
+    has_commented = get_has_commented(comments, current_user.id, game)
+
+    favourites = GameFavourite.objects.all()
+    user_favourite = get_current_favourite(favourites, current_user.pk, game)
+
+    if request.method == 'GET':
+        form = GameCommentForm()
+    else:
+        form = GameCommentForm(request.POST)
+        if form.is_valid():
+            rating = form.save(commit=False)
+            rating.game = game
+            rating.user = current_user
+            rating.save()
+            return redirect('details game', game_id)
+
+    context = {
+        'game': game,
+        'user': current_user,
+        'user_favourite': user_favourite,
+        'form': form,
+        'personal_rating': current_user_rating,
+        'average': average_rating,
+        'has_commented': has_commented,
+        'game_comments': current_game_comments,
+    }
+
+    return render(request, 'create-and-edit-comment.html', context)
+
+
+@login_required
+def edit_comment(request, pk):
+    game = get_game_by_id(Game, pk)
+    current_user = request.user
+    game_id = game.pk
+
+    ratings = GameScore.objects.all()
+    current_user_rating = get_rating(ratings, current_user.pk, game)
+    average_rating = get_average_rating(ratings, game)
+
+    comments = GameComment.objects.all()
+    current_game_comments = GameComment.objects.filter(game_id=game.pk)
+    has_commented = get_has_commented(comments, current_user.id, game)
+    comment = get_comment(comments, current_user, game)
+
+    favourites = GameFavourite.objects.all()
+    user_favourite = get_current_favourite(favourites, current_user.pk, game)
+
+    if request.method == 'GET':
+        form = CommentEditForm(instance=comment)
+    else:
+        form = CommentEditForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('details game', game_id)
+
+    context = {
+        'game': game,
+        'user': current_user,
+        'user_favourite': user_favourite,
+        'form': form,
+        'personal_rating': current_user_rating,
+        'average': average_rating,
+        'has_commented': has_commented,
+        'game_comments': current_game_comments,
+    }
+
+    return render(request, 'create-and-edit-comment.html', context)
+
+
+@login_required
+def delete_comment(request, pk):
+    game = get_game_by_id(Game, pk)
+    current_user = request.user
+    comments = GameComment.objects.all()
+    comment = get_comment(comments, current_user, game)
+    comment.delete()
+
+    return redirect('details game', game.pk)
 
 
 @login_required
@@ -212,23 +272,79 @@ def rate_game(request, pk):
     current_user = request.user
     game_id = game.pk
     ratings = GameScore.objects.all()
-    current_rating = get_current_rating(ratings, current_user, game)
+    current_user_rating = get_rating(ratings, current_user.pk, game)
+    average_rating = get_average_rating(ratings, game)
 
-    if request.method == 'POST':
-        if not current_rating:
-            form = GameRatingForm(request.POST)
+    comments = GameComment.objects.all()
+    current_game_comments = GameComment.objects.filter(game_id=game.pk)
+    has_commented = get_has_commented(comments, current_user.id, game)
 
-            if form.is_valid():
-                comment = form.save(commit=False)
-                comment.game = game
-                comment.user = current_user
-                comment.save()
-                return redirect('details game', game_id)
-        else:
-            form = RatingEditForm(request.POST, instance=current_rating)
-            if form.is_valid():
-                form.save()
-                return redirect('details game', game_id)
+    favourites = GameFavourite.objects.all()
+    user_favourite = get_current_favourite(favourites, current_user.pk, game)
+
+    if request.method == 'GET':
+        form = GameRatingForm()
+    else:
+        form = GameRatingForm(request.POST)
+        if form.is_valid():
+            rating = form.save(commit=False)
+            rating.game = game
+            rating.user = current_user
+            rating.save()
+            return redirect('details game', game_id)
+
+    context = {
+        'game': game,
+        'user': current_user,
+        'user_favourite': user_favourite,
+        'form': form,
+        'personal_rating': current_user_rating,
+        'average': average_rating,
+        'has_commented': has_commented,
+        'game_comments': current_game_comments,
+    }
+
+    return render(request, 'create-and-edit-rating.html', context)
+
+
+@login_required
+def edit_rating(request, pk):
+    game = get_game_by_id(Game, pk)
+    current_user = request.user
+    game_id = game.pk
+
+    ratings = GameScore.objects.all()
+    current_user_rating = get_rating(ratings, current_user.pk, game)
+    rating = get_current_rating(ratings, current_user, game)
+    average_rating = get_average_rating(ratings, game)
+
+    comments = GameComment.objects.all()
+    current_game_comments = GameComment.objects.filter(game_id=game.pk)
+    has_commented = get_has_commented(comments, current_user.id, game)
+
+    favourites = GameFavourite.objects.all()
+    user_favourite = get_current_favourite(favourites, current_user.pk, game)
+
+    if request.method == 'GET':
+        form = RatingEditForm(instance=rating)
+    else:
+        form = RatingEditForm(request.POST, instance=rating)
+        if form.is_valid():
+            form.save()
+            return redirect('details game', game_id)
+
+    context = {
+        'game': game,
+        'user': current_user,
+        'user_favourite': user_favourite,
+        'form': form,
+        'personal_rating': current_user_rating,
+        'average': average_rating,
+        'has_commented': has_commented,
+        'game_comments': current_game_comments,
+    }
+
+    return render(request, 'create-and-edit-rating.html', context)
 
 
 @login_required
@@ -239,19 +355,85 @@ def favourite_game(request, pk):
     favourites = GameFavourite.objects.all()
     user_favourite = get_current_favourite(favourites, current_user.pk, game)
 
-    if request.method == "POST":
-        if not user_favourite:
-            form = GameFavouriteForm(request.POST)
+    ratings = GameScore.objects.all()
+    current_user_rating = get_rating(ratings, current_user.pk, game)
+    average_rating = get_average_rating(ratings, game)
 
-            if form.is_valid():
-                comment = form.save(commit=False)
-                comment.game = game
-                comment.user = current_user
-                comment.save()
-                return redirect('details game', game_id)
-        else:
-            form = EditFavouriteForm(request.POST, instance=user_favourite)
-            if form.is_valid():
-                form.save()
-                return redirect('details game', game_id)
+    comments = GameComment.objects.all()
+    current_game_comments = GameComment.objects.filter(game_id=game.pk)
+    has_commented = get_has_commented(comments, current_user.id, game)
+
+    if request.method == 'GET':
+        form = GameFavouriteForm()
+    else:
+        form = GameFavouriteForm(request.POST)
+        if form.is_valid():
+            favourite = form.save(commit=False)
+            favourite.game = game
+            favourite.user = current_user
+            favourite.save()
+            return redirect('details game', game_id)
+
+    context = {
+        'game': game,
+        'user': current_user,
+        'user_favourite': user_favourite,
+        'form': form,
+        'personal_rating': current_user_rating,
+        'average': average_rating,
+        'has_commented': has_commented,
+        'game_comments': current_game_comments,
+    }
+
+    return render(request, 'create-and-edit-favourite.html', context)
+
+
+@login_required
+def edit_favourite_game(request, pk):
+    game = get_game_by_id(Game, pk)
+    current_user = request.user
+    game_id = game.pk
+    favourites = GameFavourite.objects.all()
+    user_favourite = get_current_favourite(favourites, current_user.pk, game)
+
+    # TODO: Potentially may need to add more items in context, just like 'favourite create'
+    ratings = GameScore.objects.all()
+    current_user_rating = get_rating(ratings, current_user.pk, game)
+    average_rating = get_average_rating(ratings, game)
+
+    if request.method == 'GET':
+        form = EditFavouriteForm(instance=user_favourite)
+    else:
+        form = EditFavouriteForm(request.POST, instance=user_favourite)
+        if form.is_valid():
+            form.save()
+            return redirect('details game', game_id)
+
+    context = {
+        'game': game,
+        'user': current_user,
+        'user_favourite': user_favourite,
+        'form': form,
+        'personal_rating': current_user_rating,
+        'average': average_rating,
+    }
+
+    return render(request, 'create-and-edit-favourite.html', context)
+
+
+# TODO: Finish these views if they are necessary in the project, if not just remove them
+@login_required
+def delete_user_profile(request, slug, pk):
+    pass
+
+
+@login_required
+def delete_comment(request, slug, pk):
+    pass
+
+
+@login_required
+def delete_rating(request, slug, pk):
+    pass
+
 

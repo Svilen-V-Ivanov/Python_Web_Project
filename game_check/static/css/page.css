@@ -149,3 +149,13 @@ body, html {
 .color-light-green {
     color: lightgreen;
 }
+
+.color-purple {
+    color: purple;
+}
+
+.font-size-24 {
+    font-style: italic;
+    font-size: 24px;
+    color: white;
+}

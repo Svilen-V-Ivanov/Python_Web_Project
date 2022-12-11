@@ -1,28 +1,38 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg">
 <head>
     <meta charset="UTF-8">
     <title>GameCheck</title>
 </head>
-<body>
-
+<body class="elements">
+<link rel="stylesheet" href="{% static 'css/page.css' %}">
 <header>
     {% include 'nav.html' %}
 </header>
 
-<ul>
+<div class="inline-order">
     {% if len == 0 %}
-        No Reviewed Games!
+        <div class="box">
+            <p class="font-size-24">No Reviewed Games!</p>
+        </div>
     {% else %}
+        <div class="inline-order">
         {% for game in games %}
-            <li>
-                <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
-            </li>
-            <li>
-                {{ game.title }}
-            </li>
+            <div class="box">
+                <p><img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50"></p>
+                <p>{{ game.title }}</p>
+                <p>
+                    <a class='button' href="{% url 'details game' pk=game.pk %}">Details game</a>
+                </p>
+            </div>
+            {% if forloop.counter|divisibleby:4 %}
+            </div>
+                <div class="inline-order">
+        {% endif %}
         {% endfor %}
+            </div>
     {% endif %}
-</ul>
+</div>
 </body>
 </html>

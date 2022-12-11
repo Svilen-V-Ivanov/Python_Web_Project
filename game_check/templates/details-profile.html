@@ -1,41 +1,42 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg">
 <head>
     <meta charset="UTF-8">
     <title>GameCheck</title>
 </head>
-<body>
-
+<body class="elements">
+<link rel="stylesheet" href="{% static 'css/page.css' %}">
 <header>
     {% include 'nav.html' %}
 </header>
 
-<ul>
-    <li>
-        {% if object.avatar%}
-            <img src="/media/{{ object.avatar }}" alt="temp-default.jpg">
-        {% else %}
-            <img src="{% static 'temp-default.jpg' %}" alt="temp-default.jpg">
-        {% endif %}
-    </li>
-    <li>
-        {{ object.name }}
-    </li>
-    <li>
-        {{ object.age }}
-    </li>
-    <li>
-        {{ object.gender }}
-    </li>
-    <li>
-        {{ object.bio }}
-    </li>
-    <li>
-        <a href="{% url 'edit profile' slug=user.slug pk=user.pk %}">Edit profile</a>
-    </li>
-
-</ul>
+<div class="inline-order">
+    <div class="game-box">
+        <p>
+            {% if object.avatar %}
+                <img src="/media/{{ object.avatar }}" alt="temp-default.jpg" width="75" height="75">
+            {% else %}
+                <img src="{% static 'temp-default.jpg' %}" alt="temp-default.jpg" width="75" height="75">
+            {% endif %}
+        </p>
+        <p>
+            {{ object.name }}
+        </p>
+        <p>
+            {{ object.age }}
+        </p>
+        <p>
+            {{ object.gender }}
+        </p>
+        <p>
+            {{ object.bio }}
+        </p>
+        <p>
+            <a class="button" href="{% url 'edit profile' slug=user.slug pk=user.pk %}">Edit profile</a>
+        </p>
+    </div>
+</div>
 
 </body>
 </html>
