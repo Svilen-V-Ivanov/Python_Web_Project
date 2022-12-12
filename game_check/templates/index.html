@@ -7,6 +7,7 @@
 </head>
 <body class="elements">
 <link rel="stylesheet" href="{% static 'css/page.css' %}">
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
 <header>
     {% include 'nav.html' %}
 </header>
@@ -18,7 +19,14 @@
 {% else %}
 {% endif %}
 <div class="inline-order">
-    {% for game in games %}
+    <form method="POST" action="{% url 'search' %}">
+        {% csrf_token %}
+        <input type="search" placeholder="Search" aria-label="Search" name="searched">
+        <button class="button">Search</button>
+    </form>
+</div>
+<div class="inline-order">
+    {% for game in page_obj %}
         <div class="box">
             <p>
                 <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
@@ -36,6 +44,24 @@
         {% endif %}
     {% endfor %}
     </div>
+{#TODO: Check later after cache reset if this works correctly#}
+{% if not page_obj %}
+
+{% else %}
+    <div>
+        <p class="white-color">
+            {% if page_obj.has_previous %}
+                <a class="button" href="?page=1">First</a>
+                <a class="button" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            {% if page_obj.has_next %}
+                <a class="button" href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a class="button" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            {% endif %}
+        </p>
+    </div>
+{% endif %}
 </body>
 </html>
 

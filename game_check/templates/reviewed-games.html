@@ -34,5 +34,23 @@
             </div>
     {% endif %}
 </div>
+{#TODO: Check later if it works correctly with 8+ games#}
+{% if not page_obj %}
+
+{% else %}
+    <div>
+        <p class="white-color">
+            {% if page_obj.has_previous %}
+                <a class="button" href="?page=1">First</a>
+                <a class="button" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            {% if page_obj.has_next %}
+                <a class="button" href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a class="button" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            {% endif %}
+        </p>
+    </div>
+{% endif %}
 </body>
 </html>

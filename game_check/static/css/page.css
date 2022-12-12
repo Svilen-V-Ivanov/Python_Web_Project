@@ -100,7 +100,7 @@ body, html {
     font-style: italic;
 }
 .button {
-    background-color: lightgreen; /* Green */
+    background-color: lightgreen;
     border: none;
     border-radius: 25px;
     color: white;
@@ -110,8 +110,10 @@ body, html {
     display: inline-block;
     font-size: 16px;
 }
-
-
+.white-color {
+  color: white;
+  font-style: italic;
+}
 
 .scrolldiv {
     margin:4px;

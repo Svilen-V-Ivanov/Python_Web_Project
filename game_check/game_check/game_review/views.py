@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic as views
@@ -14,10 +15,30 @@ UserModel = get_user_model()
 
 
 def index(request):
+    games = Game.objects.all()
+    paginator = Paginator(games, 8)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
-        'games': Game.objects.all(),
+        'games': games,
+        'page_obj': page_obj,
     }
     return render(request, 'index.html', context)
+
+
+def search_bar(request):
+    if request.method == 'POST':
+        searched = request.POST['searched']
+        games = Game.objects.filter(title__contains=searched)
+        return render(request, 'search-bar.html', {
+            'searched': searched,
+            'games': games,
+        })
+    else:
+        games = Game.objects.all()
+        return render(request, 'search-bar.html', {
+            'games': games,
+        })
 
 
 class UserSignUpView(views.CreateView):
@@ -59,11 +80,18 @@ def profile_reviewed_games(request, slug, pk):
     user_comments = GameComment.objects.filter(user_id=pk)
     all_games = Game.objects.all()
     reviewed_games = get_reviewed_games(all_games, user_scores, user_comments, user)
+
+    paginator = Paginator(reviewed_games, 8)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # TODO: remove this if it's not used
     game_len = get_len(reviewed_games)
 
     context = {
         'games': reviewed_games,
         'len': game_len,
+        'page_obj': page_obj,
     }
 
     return render(request, 'reviewed-games.html', context)
@@ -75,11 +103,18 @@ def profile_favourite_games(request, slug, pk):
     user_favourites = GameFavourite.objects.filter(user_id=pk)
     all_games = Game.objects.all()
     favourite_games = get_favourite_games(all_games, user_favourites, user)
+
+    paginator = Paginator(favourite_games, 8)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # TODO: remove this if it's not used
     game_len = get_len(favourite_games)
 
     context = {
         'games': favourite_games,
         'len': game_len,
+        'page_obj': page_obj,
     }
 
     return render(request, 'favourite-games.html', context)

@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>GameCheck</title>
+</head>
+<body class="elements">
+<link rel="stylesheet" href="{% static 'css/page.css' %}">
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<header>
+    {% include 'nav.html' %}
+</header>
+{% if request.user.is_authenticated %}
+    <div class="small-box">
+        <a href="{% url 'create game' %}">ADD GAME</a>
+
+    </div>
+{% else %}
+{% endif %}
+<div class="inline-order">
+    <form method="POST" action="{% url 'search' %}">
+        {% csrf_token %}
+        <input type="search" placeholder="Search" aria-label="Search" name="searched">
+        <button class="button">Search</button>
+    </form>
+</div>
+{% if searched %}
+    <div class="inline-order">
+        {% for game in games %}
+            <div class="box">
+                <p>
+                    <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
+                </p>
+                <p>
+                    {{ game.title }}
+                </p>
+                <p>
+                    <a class="button" href="{% url 'details game' pk=game.pk %}">Details game</a>
+                </p>
+            </div>
+            {% if forloop.counter|divisibleby:4 %}
+                </div>
+                <div class="inline-order">
+            {% endif %}
+        {% endfor %}
+        </div>
+
+{% else %}
+    <div class="inline-order">
+        {% for game in games %}
+            <div class="box">
+                <p>
+                    <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
+                </p>
+                <p>
+                    {{ game.title }}
+                </p>
+                <p>
+                    <a class="button" href="{% url 'details game' pk=game.pk %}">Details game</a>
+                </p>
+            </div>
+            {% if forloop.counter|divisibleby:4 %}
+                </div>
+                <div class="inline-order">
+            {% endif %}
+        {% endfor %}
+        </div>
+{% endif %}
+</body>
+</html>
