@@ -6,35 +6,38 @@
     <title>GameCheck</title>
 </head>
 <body class="elements">
-<link rel="stylesheet" href="{% static 'css/page.css' %}">
-<header>
-    {% include 'nav.html' %}
-</header>
 
+<header>
+    {% include 'core/nav.html' %}
+</header>
+<link rel="stylesheet" href="{% static 'css/page.css' %}">
 <div class="inline-order">
+
     {% if len == 0 %}
         <div class="box">
-            <p class="font-size-24">No Reviewed Games!</p>
+            <p class="font-size-24">No Favourite Games!</p>
         </div>
     {% else %}
-        <div class="inline-order">
         {% for game in games %}
             <div class="box">
-                <p><img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50"></p>
-                <p>{{ game.title }}</p>
+                <p>
+                    <img src="/media/{{ game.image }}" alt="temp-default.jpg" width="50" height="50">
+                </p>
+                <p>
+                    {{ game.title }}
+                </p>
                 <p>
                     <a class='button' href="{% url 'details game' pk=game.pk %}">Details game</a>
                 </p>
             </div>
             {% if forloop.counter|divisibleby:4 %}
-            </div>
+                </div>
                 <div class="inline-order">
-        {% endif %}
+            {% endif %}
         {% endfor %}
-            </div>
     {% endif %}
-</div>
-{#TODO: Check later if it works correctly with 8+ games#}
+    </div>
+
 {% if not page_obj %}
 
 {% else %}

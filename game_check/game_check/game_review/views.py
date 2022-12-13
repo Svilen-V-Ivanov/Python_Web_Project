@@ -23,26 +23,30 @@ def index(request):
         'games': games,
         'page_obj': page_obj,
     }
-    return render(request, 'index.html', context)
+    return render(request, 'core/index.html', context)
 
 
 def search_bar(request):
     if request.method == 'POST':
         searched = request.POST['searched']
         games = Game.objects.filter(title__contains=searched)
-        return render(request, 'search-bar.html', {
+        return render(request, 'core/search-bar.html', {
             'searched': searched,
             'games': games,
         })
     else:
         games = Game.objects.all()
-        return render(request, 'search-bar.html', {
+        return render(request, 'core/search-bar.html', {
             'games': games,
         })
 
 
+def redirect_when_not_logged_in(request):
+    return render(request, 'core/not-logged-in.html')
+
+
 class UserSignUpView(views.CreateView):
-    template_name = 'sign-up-user.html'
+    template_name = 'core/sign-up-user.html'
     form_class = SignUpForm
     success_url = reverse_lazy('index')
 
@@ -54,7 +58,7 @@ class UserSignUpView(views.CreateView):
 
 
 class UserSignInView(auth_views.LoginView):
-    template_name = 'sign-in-user.html'
+    template_name = 'core/sign-in-user.html'
     success_url = reverse_lazy('index')
 
     def get_success_url(self):
@@ -64,7 +68,7 @@ class UserSignInView(auth_views.LoginView):
 
 
 class UserSignOutView(auth_mixins.LoginRequiredMixin, auth_views.LogoutView):
-    template_name = 'sign-out-user.html'
+    template_name = 'core/sign-out-user.html'
     success_url = reverse_lazy('index')
 
     def get_success_url(self):
@@ -85,16 +89,12 @@ def profile_reviewed_games(request, slug, pk):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # TODO: remove this if it's not used
-    game_len = get_len(reviewed_games)
-
     context = {
         'games': reviewed_games,
-        'len': game_len,
         'page_obj': page_obj,
     }
 
-    return render(request, 'reviewed-games.html', context)
+    return render(request, 'user/reviewed-games.html', context)
 
 
 @login_required
@@ -108,28 +108,24 @@ def profile_favourite_games(request, slug, pk):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # TODO: remove this if it's not used
-    game_len = get_len(favourite_games)
-
     context = {
         'games': favourite_games,
-        'len': game_len,
         'page_obj': page_obj,
     }
 
-    return render(request, 'favourite-games.html', context)
+    return render(request, 'user/favourite-games.html', context)
 
 
 class UserDetailsView(auth_mixins.LoginRequiredMixin, views.DetailView):
     context_object_name = 'user_details'
     model = Profile
-    template_name = 'details-profile.html'
+    template_name = 'user/details-profile.html'
 
 
 class UserEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     model = Profile
     fields = ('avatar', 'name', 'age', 'gender', 'bio')
-    template_name = 'edit-profile.html'
+    template_name = 'user/edit-profile.html'
     # TODO: fix success_url to redirect to proper url
     success_url = reverse_lazy('index')
 
@@ -142,10 +138,9 @@ class UserEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     #     return result
 
 
-# TODO : Fix redirect on password change or make changes to 'index.html'
 class PasswordEditView(auth_mixins.LoginRequiredMixin, auth_views.PasswordChangeView):
     form_class = ChangeUserPasswordForm
-    template_name = 'edit_password.html'
+    template_name = 'user/edit_password.html'
     success_url = reverse_lazy('index')
 
 
@@ -153,17 +148,12 @@ class PasswordEditView(auth_mixins.LoginRequiredMixin, auth_views.PasswordChange
 class EmailEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     model = UserModel
     fields = ('email',)
-    template_name = 'edit-email.html'
+    template_name = 'user/edit-email.html'
     success_url = reverse_lazy('index')
 
 
-# TODO: make this view
-class OtherProfileView(views.DetailView):
-    pass
-
-
 class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):
-    template_name = 'create-game.html'
+    template_name = 'game/create-game.html'
     model = Game
     fields = ('title', 'image')
     success_url = reverse_lazy('index')
@@ -176,9 +166,6 @@ class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):
 def games_details(request, pk):
     current_game = get_game_by_id(Game, pk)
     current_user_id = request.user.pk
-
-    comment_form = GameCommentForm()
-    comment_edit = CommentEditForm()
 
     comments = GameComment.objects.all()
     current_game_comments = GameComment.objects.filter(game_id=current_game.pk)
@@ -195,9 +182,6 @@ def games_details(request, pk):
         'game': current_game,
         'user_id': current_user_id,
 
-        'comment_form': comment_form,
-        'edit_comment': comment_edit,
-
         'has_commented': has_commented,
         'game_comments': current_game_comments,
         'personal_rating': current_user_rating,
@@ -205,7 +189,7 @@ def games_details(request, pk):
         'user_favourite': user_favourite,
     }
 
-    return render(request, 'details-game.html', context)
+    return render(request, 'game/details-game.html', context)
 
 
 @login_required
@@ -247,7 +231,7 @@ def comment_game(request, pk):
         'game_comments': current_game_comments,
     }
 
-    return render(request, 'create-and-edit-comment.html', context)
+    return render(request, 'game/create-and-edit-comment.html', context)
 
 
 @login_required
@@ -287,7 +271,7 @@ def edit_comment(request, pk):
         'game_comments': current_game_comments,
     }
 
-    return render(request, 'create-and-edit-comment.html', context)
+    return render(request, 'game/create-and-edit-comment.html', context)
 
 
 @login_required
@@ -339,7 +323,7 @@ def rate_game(request, pk):
         'game_comments': current_game_comments,
     }
 
-    return render(request, 'create-and-edit-rating.html', context)
+    return render(request, 'game/create-and-edit-rating.html', context)
 
 
 @login_required
@@ -379,7 +363,7 @@ def edit_rating(request, pk):
         'game_comments': current_game_comments,
     }
 
-    return render(request, 'create-and-edit-rating.html', context)
+    return render(request, 'game/create-and-edit-rating.html', context)
 
 
 @login_required
@@ -420,7 +404,7 @@ def favourite_game(request, pk):
         'game_comments': current_game_comments,
     }
 
-    return render(request, 'create-and-edit-favourite.html', context)
+    return render(request, 'game/create-and-edit-favourite.html', context)
 
 
 @login_required
@@ -431,7 +415,6 @@ def edit_favourite_game(request, pk):
     favourites = GameFavourite.objects.all()
     user_favourite = get_current_favourite(favourites, current_user.pk, game)
 
-    # TODO: Potentially may need to add more items in context, just like 'favourite create'
     ratings = GameScore.objects.all()
     current_user_rating = get_rating(ratings, current_user.pk, game)
     average_rating = get_average_rating(ratings, game)
@@ -453,22 +436,4 @@ def edit_favourite_game(request, pk):
         'average': average_rating,
     }
 
-    return render(request, 'create-and-edit-favourite.html', context)
-
-
-# TODO: Finish these views if they are necessary in the project, if not just remove them
-@login_required
-def delete_user_profile(request, slug, pk):
-    pass
-
-
-@login_required
-def delete_comment(request, slug, pk):
-    pass
-
-
-@login_required
-def delete_rating(request, slug, pk):
-    pass
-
-
+    return render(request, 'game/create-and-edit-favourite.html', context)

@@ -25,8 +25,6 @@ class SignUpForm(auth_forms.UserCreationForm):
             user=user,
             name=self.cleaned_data['name'],
             age=self.cleaned_data['age'],
-
-
         )
 
         if commit:

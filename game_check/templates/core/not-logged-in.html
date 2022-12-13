@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>GameCheck</title>
+</head>
+<body class="elements">
+<link rel="stylesheet" href="{% static 'css/page.css' %}">
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<header>
+    {% include 'core/nav.html' %}
+</header>
+<div class="box">
+    <p class="font-size-24">This page requires being logged in, please log!</p>
+    <a class="button" href="{% url 'sign in user' %}">Sign In</a>
+    <a class="button" href="{% url 'sign up user' %}">Sign Up</a>
+</div>
+</body>
+</html>

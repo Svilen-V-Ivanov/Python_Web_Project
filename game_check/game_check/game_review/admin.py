@@ -7,7 +7,6 @@ from game_check.game_review.models import Game, GameScore, GameComment, GameFavo
 UserModel = get_user_model()
 
 
-# TODO: Fix admin
 @admin.register(UserModel)
 class SiteUserAdmin(auth_admin.UserAdmin):
     list_display = ['id', 'username', 'email', 'last_login', "date_joined", 'is_staff', ]

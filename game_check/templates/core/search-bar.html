@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="{% static 'css/page.css' %}">
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <header>
-    {% include 'nav.html' %}
+    {% include 'core/nav.html' %}
 </header>
 {% if request.user.is_authenticated %}
     <div class="small-box">

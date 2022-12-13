@@ -8,13 +8,13 @@
 <body class="elements">
 <link rel="stylesheet" href="{% static 'css/page.css' %}">
 <header>
-    {% include 'nav.html' %}
+    {% include 'core/nav.html' %}
 </header>
 
 <div class="inline-order">
-    <div class="box">
-        <p class="font-size-24">Change password</p>
-        <form method="post" action="{% url 'edit password' slug=user.slug pk=user.pk %} " enctype="multipart/form-data">
+    <div class="game-box">
+        <p class="font-size-24">Profile Details</p>
+        <form method="post" action="{% url 'edit profile' slug=user.slug pk=user.pk %} " enctype="multipart/form-data">
             {{ form.as_p }}
             <button class="button">Update</button>
             {% csrf_token %}

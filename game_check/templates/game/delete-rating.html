@@ -8,7 +8,7 @@
 <body class="elements">
 
 <header>
-    {% include 'nav.html' %}
+    {% include 'core/nav.html' %}
 </header>
 <link rel="stylesheet" href="{% static 'css/page.css' %}">
 <div class="game-box">
@@ -22,7 +22,7 @@
     {% if not user_favourite or user_favourite.is_favourite == False %}
 
     {% else %}
-        <img src="/static/images/star-profile.png" alt="Default" width="25" height="25">
+        <img src="/images/star-profile.png" alt="Default" width="25" height="25">
     {% endif %}
 
     {% if not user_favourite %}

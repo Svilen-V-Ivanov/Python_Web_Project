@@ -10,7 +10,6 @@ from game_check.game_review.validators import username_validator, validate_file_
     score_validator
 
 
-# TODO: Need another class, only 4 currently
 class ChoicesEnumMixin:
     @classmethod
     def choices(cls):
@@ -70,7 +69,6 @@ class SiteUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
 
         super(SiteUser, self).save(*args, **kwargs)
 
-    # TODO: Is email field needed?
     EMAIL_FIELD = "email"
     USERNAME_FIELD = 'username'
 
@@ -97,7 +95,6 @@ class Profile(models.Model):
         default='Male',
     )
 
-    # TODO: removing default can potentially break the form so be careful later on
     avatar = models.ImageField(
         upload_to='avatars',
         validators=(
@@ -105,7 +102,6 @@ class Profile(models.Model):
         ),
         null=True,
         blank=True,
-        # default='temp-default.jpg'
     )
 
     bio = models.TextField(

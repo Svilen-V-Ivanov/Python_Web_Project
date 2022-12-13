@@ -3,10 +3,12 @@ from django.urls import path, include
 from game_check.game_review.views import UserSignUpView, UserSignInView, UserSignOutView, \
     UserDetailsView, UserEditView, PasswordEditView, EmailEditView, GameCreateView, index, \
     comment_game, games_details, rate_game, favourite_game, profile_reviewed_games, profile_favourite_games, \
-    delete_comment, edit_favourite_game, edit_rating, edit_comment, delete_user_profile, search_bar
+    delete_comment, edit_favourite_game, edit_rating, edit_comment, search_bar, \
+    redirect_when_not_logged_in
 
 urlpatterns = (
     path('', index, name='index'),
+    path('not/logged/in', redirect_when_not_logged_in, name='not logged in'),
     path('search/', search_bar, name='search'),
     path('sign-up/', UserSignUpView.as_view(), name='sign up user'),
     path('sign-in/', UserSignInView.as_view(), name='sign in user'),
@@ -23,10 +25,6 @@ urlpatterns = (
             path('favourite/', profile_favourite_games, name='favourite games'),
         ])),
     ])),
-    # path('admin/<slug:slug>/<int:pk>/', include([
-    #     path('delete/user/', delete_user_profile, name='delete user'),
-    #
-    # ])),
     path('game/', include([
         path('', GameCreateView.as_view(), name='create game'),
         path('details/', include([

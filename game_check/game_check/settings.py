@@ -93,9 +93,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-# TODO: Confirm static and media files are set up correctly!
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
 
@@ -110,3 +107,5 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'game_review.SiteUser'
+
+LOGIN_URL = 'not logged in'

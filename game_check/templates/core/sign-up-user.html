@@ -8,13 +8,13 @@
 <body class="elements">
 <link rel="stylesheet" href="{% static 'css/page.css' %}">
 <header>
-    {% include 'nav.html' %}
+    {% include 'core/nav.html' %}
 </header>
 <div class="game-box">
     <p class="font-size-24">Create Account</p>
     <form method="post" action="{% url 'sign up user' %}">
         {{ form.as_p }}
-        <button>Create account</button>
+        <button class="button">Create account</button>
         {% csrf_token %}
     </form>
 </div>
