@@ -10,15 +10,20 @@
 <header>
     {% include 'core/nav.html' %}
 </header>
-<div class="game-box">
-    <p class="font-size-24">Sign In:</p>
-    <form method="post" action="{% url 'sign in user' %}">
-        {{ form.as_p }}
+{% if request.user.is_authenticated %}
+    <div class="game-box">Already logged in
+        <a class="button" href="{% url 'index' %}">Index</a></div>
+{% else %}
+    <div class="game-box">
+        <p class="font-size-24">Sign In:</p>
+        <form method="post" action="{% url 'sign in user' %}">
+            {{ form.as_p }}
 
-        <button class="button">Sign in</button>
-        {% csrf_token %}
-    </form>
-</div>
+            <button class="button">Sign in</button>
+            {% csrf_token %}
+        </form>
+    </div>
+{% endif %}
 </body>
 </html>
 
