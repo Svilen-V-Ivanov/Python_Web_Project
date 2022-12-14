@@ -10,6 +10,10 @@ def get_game_by_id(model, value):
     return model.objects.filter(pk=value).get()
 
 
+def get_user_by_id(model, value):
+    return model.objects.filter(pk=value).get()
+
+
 def get_comment(comments, user, game):
     for comment in comments:
         if comment.user_id == user.pk and comment.game_id == game.pk:

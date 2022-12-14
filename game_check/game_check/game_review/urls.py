@@ -4,10 +4,11 @@ from game_check.game_review.views import UserSignUpView, UserSignInView, UserSig
     UserDetailsView, UserEditView, PasswordEditView, EmailEditView, GameCreateView, index, \
     comment_game, games_details, rate_game, favourite_game, profile_reviewed_games, profile_favourite_games, \
     delete_comment, edit_favourite_game, edit_rating, edit_comment, search_bar, \
-    redirect_when_not_logged_in
+    redirect_when_not_logged_in, bad_request
 
 urlpatterns = (
     path('', index, name='index'),
+    path('error/', bad_request, name='bad request'),
     path('not/logged/in', redirect_when_not_logged_in, name='not logged in'),
     path('search/', search_bar, name='search'),
     path('sign-up/', UserSignUpView.as_view(), name='sign up user'),

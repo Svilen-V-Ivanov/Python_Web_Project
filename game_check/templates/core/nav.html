@@ -31,7 +31,7 @@
 
     {% else %}
         <li>
-            <img src="/images/star-profile.png" alt="Default" width="25" height="25">
+            <img src="{% static '/images/star-profile.png' %}" alt="Default" width="25" height="25">
             Profile
         </li>
         <a href="{% url 'details profile' slug=user.slug pk=user.pk %}">

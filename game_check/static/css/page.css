@@ -161,3 +161,27 @@ body, html {
     font-size: 24px;
     color: white;
 }
+
+.error-box {
+    width: 720px;
+    border: 15px solid lightgreen;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 50px;
+    color: white;
+}
+.error-box a {
+    color: white;
+    font-style: italic;
+    text-decoration: none;
+}
+
+.error-box li {
+    float: left;
+    color: white;
+    text-align: left;
+    padding: 2px 2px;
+    text-decoration: none;
+    font-size: 24px;
+    font-style: italic;
+}

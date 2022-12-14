@@ -9,9 +9,14 @@ from game_check.game_review.forms import SignUpForm, ChangeUserPasswordForm, Gam
     GameFavouriteForm, CommentEditForm, RatingEditForm, EditFavouriteForm
 from game_check.game_review.models import Profile, Game, GameComment, GameScore, GameFavourite
 from game_check.game_review.utils import get_game_by_id, get_has_commented, get_rating, get_average_rating, \
-    get_current_favourite, get_comment, get_current_rating, get_reviewed_games, get_favourite_games, get_len
+    get_current_favourite, get_comment, get_current_rating, get_reviewed_games, get_favourite_games, get_len \
+
 
 UserModel = get_user_model()
+
+
+def bad_request(request):
+    return render(request, 'core/bad-credentials.html')
 
 
 def index(request):
@@ -79,11 +84,17 @@ class UserSignOutView(auth_mixins.LoginRequiredMixin, auth_views.LogoutView):
 
 @login_required
 def profile_reviewed_games(request, slug, pk):
+    try:
+        request_user = UserModel.objects.filter(pk=pk, slug=slug).get()
+    except UserModel.DoesNotExist as error:
+        return redirect('bad request')
+
     user = request.user
     user_scores = GameScore.objects.filter(user_id=pk)
     user_comments = GameComment.objects.filter(user_id=pk)
     all_games = Game.objects.all()
     reviewed_games = get_reviewed_games(all_games, user_scores, user_comments, user)
+    games_len = get_len(reviewed_games)
 
     paginator = Paginator(reviewed_games, 8)
     page_number = request.GET.get('page')
@@ -92,6 +103,7 @@ def profile_reviewed_games(request, slug, pk):
     context = {
         'games': reviewed_games,
         'page_obj': page_obj,
+        'len': games_len,
     }
 
     return render(request, 'user/reviewed-games.html', context)
@@ -99,10 +111,16 @@ def profile_reviewed_games(request, slug, pk):
 
 @login_required
 def profile_favourite_games(request, slug, pk):
+    try:
+        request_user = UserModel.objects.filter(pk=pk, slug=slug).get()
+    except UserModel.DoesNotExist as error:
+        return redirect('bad request')
+
     user = request.user
     user_favourites = GameFavourite.objects.filter(user_id=pk)
     all_games = Game.objects.all()
     favourite_games = get_favourite_games(all_games, user_favourites, user)
+    games_len = get_len(favourite_games)
 
     paginator = Paginator(favourite_games, 8)
     page_number = request.GET.get('page')
@@ -111,6 +129,7 @@ def profile_favourite_games(request, slug, pk):
     context = {
         'games': favourite_games,
         'page_obj': page_obj,
+        'len': games_len,
     }
 
     return render(request, 'user/favourite-games.html', context)
@@ -144,7 +163,6 @@ class PasswordEditView(auth_mixins.LoginRequiredMixin, auth_views.PasswordChange
     success_url = reverse_lazy('index')
 
 
-# TODO: Maybe make changing email look a bit better, also if enough time add signal to send email for email change
 class EmailEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     model = UserModel
     fields = ('email',)
@@ -164,23 +182,27 @@ class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):
 
 
 def games_details(request, pk):
-    current_game = get_game_by_id(Game, pk)
-    current_user_id = request.user.pk
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
+    current_user = request.user
 
     comments = GameComment.objects.all()
-    current_game_comments = GameComment.objects.filter(game_id=current_game.pk)
-    has_commented = get_has_commented(comments, current_user_id, current_game)
+    current_game_comments = GameComment.objects.filter(game_id=game.pk)
+    has_commented = get_has_commented(comments, current_user.pk, game)
 
     ratings = GameScore.objects.all()
-    current_user_rating = get_rating(ratings, current_user_id, current_game)
-    average_rating = get_average_rating(ratings, current_game)
+    current_user_rating = get_rating(ratings, current_user.pk, game)
+    average_rating = get_average_rating(ratings, game)
 
     favourites = GameFavourite.objects.all()
-    user_favourite = get_current_favourite(favourites, current_user_id, current_game)
+    user_favourite = get_current_favourite(favourites, current_user.pk, game)
 
     context = {
-        'game': current_game,
-        'user_id': current_user_id,
+        'game': game,
+        'user_id': current_user.pk,
 
         'has_commented': has_commented,
         'game_comments': current_game_comments,
@@ -196,7 +218,6 @@ def games_details(request, pk):
 def comment_game(request, pk):
     game = get_game_by_id(Game, pk)
     current_user = request.user
-    game_id = game.pk
 
     ratings = GameScore.objects.all()
     current_user_rating = get_rating(ratings, current_user.pk, game)
@@ -218,7 +239,7 @@ def comment_game(request, pk):
             rating.game = game
             rating.user = current_user
             rating.save()
-            return redirect('details game', game_id)
+            return redirect('details game', game.pk)
 
     context = {
         'game': game,
