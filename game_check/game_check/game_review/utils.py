@@ -1,3 +1,6 @@
+from django.urls import reverse_lazy
+
+
 def megabytes_to_bytes(mb):
     return mb * 1024 * 1024
 
@@ -116,3 +119,14 @@ def get_favourite_games(games, favourites, user):
 
 def get_len(item):
     return len(item)
+
+
+def get_redirect_url(model, user_model, self):
+    user = model.objects.filter(pk=self.request.user.pk).get()
+    site_user = user_model.objects.filter(pk=user.user.pk).get()
+    result = reverse_lazy('details profile', kwargs={
+        'slug': site_user.slug,
+        'pk': site_user.pk,
+    })
+
+    return result

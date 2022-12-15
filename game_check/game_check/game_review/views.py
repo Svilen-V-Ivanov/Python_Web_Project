@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic as views
@@ -9,10 +10,15 @@ from game_check.game_review.forms import SignUpForm, ChangeUserPasswordForm, Gam
     GameFavouriteForm, CommentEditForm, RatingEditForm, EditFavouriteForm
 from game_check.game_review.models import Profile, Game, GameComment, GameScore, GameFavourite
 from game_check.game_review.utils import get_game_by_id, get_has_commented, get_rating, get_average_rating, \
-    get_current_favourite, get_comment, get_current_rating, get_reviewed_games, get_favourite_games, get_len \
-
+    get_current_favourite, get_comment, get_current_rating, get_reviewed_games, get_favourite_games, get_len, \
+    get_redirect_url
 
 UserModel = get_user_model()
+
+
+def page_does_not_exist(request, *args, **kwargs):
+
+    return render(request, 'core/404.html', status=404)
 
 
 def bad_request(request):
@@ -139,35 +145,75 @@ class UserDetailsView(auth_mixins.LoginRequiredMixin, views.DetailView):
     context_object_name = 'user_details'
     model = Profile
     template_name = 'user/details-profile.html'
+    # TODO: Remove this before project defense
+    # def get_queryset(self):
+    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
+    #     try:
+    #         site_user = UserModel.objects.filter(pk=user.user.pk).get()
+    #     except UserModel.DoesNotExist as error:
+    #         return redirect('bad request')
+    #     return Profile.objects.filter(pk=self.request.user.pk)
 
 
 class UserEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     model = Profile
     fields = ('avatar', 'name', 'age', 'gender', 'bio')
     template_name = 'user/edit-profile.html'
-    # TODO: fix success_url to redirect to proper url
-    success_url = reverse_lazy('index')
 
+    # TODO: Delete this before project defense
     # def get_success_url(self):
+    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
+    #     site_user = UserModel.objects.filter(pk=user.user.pk).get()
     #     result = reverse_lazy('details profile', kwargs={
-    #         'slug': self.object.slug,
-    #         'pk': self.object.pk,
+    #         'slug': site_user.slug,
+    #         'pk': site_user.pk,
     #     })
     #
     #     return result
+    # TODO: make sure this still works before project defense
+    def get_success_url(self):
+        return get_redirect_url(Profile, UserModel, self)
 
 
 class PasswordEditView(auth_mixins.LoginRequiredMixin, auth_views.PasswordChangeView):
     form_class = ChangeUserPasswordForm
     template_name = 'user/edit_password.html'
-    success_url = reverse_lazy('index')
+
+    # TODO: Delete this before project defense
+    # def get_success_url(self):
+    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
+    #     site_user = UserModel.objects.filter(pk=user.user.pk).get()
+    #     result = reverse_lazy('details profile', kwargs={
+    #         'slug': site_user.slug,
+    #         'pk': site_user.pk,
+    #     })
+    #
+    #     return result
+
+    # TODO: make sure this still works before project defense
+    def get_success_url(self):
+        return get_redirect_url(Profile, UserModel, self)
 
 
 class EmailEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     model = UserModel
     fields = ('email',)
     template_name = 'user/edit-email.html'
-    success_url = reverse_lazy('index')
+
+    # TODO: Delete this before project defense
+    # def get_success_url(self):
+    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
+    #     site_user = UserModel.objects.filter(pk=user.user.pk).get()
+    #     result = reverse_lazy('details profile', kwargs={
+    #         'slug': site_user.slug,
+    #         'pk': site_user.pk,
+    #     })
+    #
+    #     return result
+
+    # TODO: make sure this still works before project defense
+    def get_success_url(self):
+        return get_redirect_url(Profile, UserModel, self)
 
 
 class GameCreateView(auth_mixins.LoginRequiredMixin, views.CreateView):

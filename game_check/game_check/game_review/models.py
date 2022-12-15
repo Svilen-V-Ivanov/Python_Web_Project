@@ -3,6 +3,7 @@ from enum import Enum
 from django.core import validators
 from django.db import models
 from django.contrib.auth import models as auth_models
+from django.shortcuts import redirect
 from django.utils.text import slugify
 
 from game_check.game_review.managers import SiteUserManager
@@ -68,6 +69,7 @@ class SiteUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
             self.slug = slugify(self.username)
 
         super(SiteUser, self).save(*args, **kwargs)
+
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = 'username'
