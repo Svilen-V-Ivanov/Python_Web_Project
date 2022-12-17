@@ -1,5 +1,7 @@
 from django.contrib.auth import forms as auth_forms, get_user_model
 from django import forms
+from django.core import validators
+
 from game_check.game_review.models import Profile, GameComment, GameScore, GameFavourite
 from game_check.game_review.validators import age_validator
 
@@ -7,10 +9,13 @@ UserModel = get_user_model()
 
 
 class SignUpForm(auth_forms.UserCreationForm):
-    name = forms.CharField()
+    name = forms.CharField(
+        max_length=25,
+    )
     age = forms.IntegerField(
         validators=(
             age_validator,
+            validators.MinValueValidator(1),
         ),
     )
 
@@ -43,6 +48,9 @@ class GameCommentForm(forms.ModelForm):
     class Meta:
         model = GameComment
         fields = ('content',)
+        labels = {
+            'content': '',
+        }
         widgets = {
             'content': forms.Textarea(
                 attrs={
@@ -58,6 +66,9 @@ class CommentEditForm(forms.ModelForm):
     class Meta:
         model = GameComment
         fields = ('content',)
+        labels = {
+            'content': '',
+        }
         widgets = {
             'content': forms.Textarea(
                 attrs={
@@ -73,6 +84,9 @@ class BaseRatingForm(forms.ModelForm):
     class Meta:
         model = GameScore
         fields = ('value',)
+        labels = {
+            'value': '',
+        }
 
 
 class GameRatingForm(BaseRatingForm):
@@ -87,6 +101,9 @@ class BaseFavouriteForm(forms.ModelForm):
     class Meta:
         model = GameFavourite
         fields = ('is_favourite',)
+        labels = {
+            'is_favourite': '',
+        }
 
 
 class GameFavouriteForm(BaseFavouriteForm):

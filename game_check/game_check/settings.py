@@ -58,7 +58,7 @@ WSGI_APPLICATION = 'game_check.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'game_reviews_db',
+        'NAME': 'game_check_db',
         'USER': 'postgres-user',
         'PASSWORD': 'password',
         'HOST': '127.0.0.1',

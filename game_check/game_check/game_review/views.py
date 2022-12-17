@@ -145,14 +145,6 @@ class UserDetailsView(auth_mixins.LoginRequiredMixin, views.DetailView):
     context_object_name = 'user_details'
     model = Profile
     template_name = 'user/details-profile.html'
-    # TODO: Remove this before project defense
-    # def get_queryset(self):
-    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
-    #     try:
-    #         site_user = UserModel.objects.filter(pk=user.user.pk).get()
-    #     except UserModel.DoesNotExist as error:
-    #         return redirect('bad request')
-    #     return Profile.objects.filter(pk=self.request.user.pk)
 
 
 class UserEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
@@ -160,17 +152,6 @@ class UserEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     fields = ('avatar', 'name', 'age', 'gender', 'bio')
     template_name = 'user/edit-profile.html'
 
-    # TODO: Delete this before project defense
-    # def get_success_url(self):
-    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
-    #     site_user = UserModel.objects.filter(pk=user.user.pk).get()
-    #     result = reverse_lazy('details profile', kwargs={
-    #         'slug': site_user.slug,
-    #         'pk': site_user.pk,
-    #     })
-    #
-    #     return result
-    # TODO: make sure this still works before project defense
     def get_success_url(self):
         return get_redirect_url(Profile, UserModel, self)
 
@@ -179,18 +160,6 @@ class PasswordEditView(auth_mixins.LoginRequiredMixin, auth_views.PasswordChange
     form_class = ChangeUserPasswordForm
     template_name = 'user/edit_password.html'
 
-    # TODO: Delete this before project defense
-    # def get_success_url(self):
-    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
-    #     site_user = UserModel.objects.filter(pk=user.user.pk).get()
-    #     result = reverse_lazy('details profile', kwargs={
-    #         'slug': site_user.slug,
-    #         'pk': site_user.pk,
-    #     })
-    #
-    #     return result
-
-    # TODO: make sure this still works before project defense
     def get_success_url(self):
         return get_redirect_url(Profile, UserModel, self)
 
@@ -200,18 +169,6 @@ class EmailEditView(auth_mixins.LoginRequiredMixin, views.UpdateView):
     fields = ('email',)
     template_name = 'user/edit-email.html'
 
-    # TODO: Delete this before project defense
-    # def get_success_url(self):
-    #     user = Profile.objects.filter(pk=self.request.user.pk).get()
-    #     site_user = UserModel.objects.filter(pk=user.user.pk).get()
-    #     result = reverse_lazy('details profile', kwargs={
-    #         'slug': site_user.slug,
-    #         'pk': site_user.pk,
-    #     })
-    #
-    #     return result
-
-    # TODO: make sure this still works before project defense
     def get_success_url(self):
         return get_redirect_url(Profile, UserModel, self)
 
@@ -262,7 +219,11 @@ def games_details(request, pk):
 
 @login_required
 def comment_game(request, pk):
-    game = get_game_by_id(Game, pk)
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
     current_user = request.user
 
     ratings = GameScore.objects.all()
@@ -303,7 +264,11 @@ def comment_game(request, pk):
 
 @login_required
 def edit_comment(request, pk):
-    game = get_game_by_id(Game, pk)
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
     current_user = request.user
     game_id = game.pk
 
@@ -343,7 +308,11 @@ def edit_comment(request, pk):
 
 @login_required
 def delete_comment(request, pk):
-    game = get_game_by_id(Game, pk)
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
     current_user = request.user
     comments = GameComment.objects.all()
     comment = get_comment(comments, current_user, game)
@@ -354,7 +323,11 @@ def delete_comment(request, pk):
 
 @login_required
 def rate_game(request, pk):
-    game = get_game_by_id(Game, pk)
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
     current_user = request.user
     game_id = game.pk
     ratings = GameScore.objects.all()
@@ -395,7 +368,11 @@ def rate_game(request, pk):
 
 @login_required
 def edit_rating(request, pk):
-    game = get_game_by_id(Game, pk)
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
     current_user = request.user
     game_id = game.pk
 
@@ -435,7 +412,11 @@ def edit_rating(request, pk):
 
 @login_required
 def favourite_game(request, pk):
-    game = get_game_by_id(Game, pk)
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
     current_user = request.user
     game_id = game.pk
     favourites = GameFavourite.objects.all()
@@ -476,7 +457,11 @@ def favourite_game(request, pk):
 
 @login_required
 def edit_favourite_game(request, pk):
-    game = get_game_by_id(Game, pk)
+    try:
+        game = get_game_by_id(Game, pk)
+    except Game.DoesNotExist as error:
+        return redirect('bad request')
+
     current_user = request.user
     game_id = game.pk
     favourites = GameFavourite.objects.all()

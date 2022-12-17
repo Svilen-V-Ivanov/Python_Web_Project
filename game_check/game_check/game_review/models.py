@@ -3,7 +3,6 @@ from enum import Enum
 from django.core import validators
 from django.db import models
 from django.contrib.auth import models as auth_models
-from django.shortcuts import redirect
 from django.utils.text import slugify
 
 from game_check.game_review.managers import SiteUserManager
@@ -69,7 +68,6 @@ class SiteUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
             self.slug = slugify(self.username)
 
         super(SiteUser, self).save(*args, **kwargs)
-
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = 'username'
@@ -158,7 +156,6 @@ class GameScore(models.Model):
         ),
         null=False,
         blank=False,
-        verbose_name='',
     )
 
     user = models.ForeignKey(
@@ -184,7 +181,6 @@ class GameComment(models.Model):
         max_length=MAX_LEN_CONT,
         null=True,
         blank=True,
-        verbose_name='',
     )
 
     date_created = models.DateTimeField(
@@ -212,7 +208,9 @@ class GameComment(models.Model):
 
 
 class GameFavourite(models.Model):
-    is_favourite = models.BooleanField(default=False, verbose_name='')
+    is_favourite = models.BooleanField(
+        default=False,
+    )
 
     user = models.ForeignKey(
         SiteUser,

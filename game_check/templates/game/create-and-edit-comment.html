@@ -17,11 +17,11 @@
 
     <p>{{ game.title }}</p>
 
-    <p>Score:{{ average }}/10.0</p>
+    <p>Score:{{ average }}/10.00</p>
     {% if personal_rating == 11 %}
-        <p>Your Score:0.0/10.0</p>
+        <p>Your Score:0.0/10.00</p>
     {% else %}
-        <p>Your Score:{{ personal_rating }}/10.0</p>
+        <p>Your Score:{{ personal_rating }}/10.00</p>
     {% endif %}
 
     {% if not user_favourite or user_favourite.is_favourite == False %}

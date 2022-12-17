@@ -61,7 +61,7 @@ def get_average_rating(ratings, game_id):
             count += 1
 
     if count == 0:
-        return 0.0
+        return 0.00
     else:
         return round(score / count, 2)
 
